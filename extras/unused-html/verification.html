@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sacred Heart Academy of Sta. Maria</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg: linear-gradient(135deg, #e9ffff, #ffffff, #e0faf6);
+    --card-bg: linear-gradient(145deg, #ffffff, #e8f8f5);
+    --text: #003f39;
+    --input-bg: linear-gradient(145deg, #ffffff, #eefaf7);
+    --button-bg: linear-gradient(145deg, #00b4a4, #008f80);
+    --shadow: rgba(0,0,0,0.2);
+}
+body.dark {
+    --bg: #0f1515;
+    --card-bg: linear-gradient(145deg, #1a2424, #0d1313);
+    --text: #e0fffb;
+    --input-bg: #1c2424;
+    --button-bg: linear-gradient(145deg, #00887a, #00685d);
+    --shadow: rgba(0,0,0,0.7);
+}
+
+body {
+    margin:0;
+    font-family:Poppins, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+}
+
+/* HEADER */
+.header {
+    background:#00A693;
+    color:white;
+    padding:13px 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo-button {
+    display:flex;
+    align-items:center;
+    text-decoration:none;
+    color:white;
+}
+
+.logo img {
+    width:60px;
+    margin-right:12px;
+}
+
+.school-name {
+    font-size:1.2em;
+    font-weight:600;
+}
+
+.dark-btn {
+    background:var(--button-bg);
+    border:none;
+    color:white;
+    padding:8px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* FORM */
+.question-section {
+    width:90%;
+    max-width:850px;
+    margin:25px auto;
+    background:var(--card-bg);
+    padding:30px;
+    padding-bottom:100px;
+    border-radius:15px;
+    position:relative;
+    box-shadow:0 8px 18px var(--shadow);
+}
+
+input {
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #b5d8d2;
+    background:var(--input-bg);
+}
+
+input[type="radio"] {
+    width:auto;
+    margin-right:6px;
+}
+
+.required::after {
+    content:"*";
+    color:red;
+}
+
+.next-button {
+    background:var(--button-bg);
+    color:white;
+    border:none;
+    padding:10px 22px;
+    border-radius:10px;
+    cursor:pointer;
+    position:absolute;
+    bottom:20px;
+    right:20px;
+}
+
+/* MODAL */
+.modal {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    z-index:2000;
+}
+
+.modal-content {
+    background:var(--card-bg);
+    margin:2% auto;
+    padding:25px;
+    border-radius:15px;
+    max-width:900px;
+    box-shadow:0 8px 18px var(--shadow);
+}
+
+/* SCROLLABLE */
+.privacy-text {
+    max-height:380px;
+    overflow-y:auto;
+    padding:15px;
+    margin:15px 0;
+    background:var(--input-bg);
+    border-radius:10px;
+    font-size:0.9em;
+    line-height:1.6;
+    border:1px solid #b5d8d2;
+}
+
+.agreement {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:15px 0;
+}
+
+.agreement input {
+    width:18px;
+    height:18px;
+}
+
+.modal-content button {
+    background:var(--button-bg);
+    color:white;
+    border:none;
+    padding:10px 22px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.modal-content button:disabled {
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
+/* ANIMATIONS */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.section-highlight {
+    display: none;
+    animation: slideDown 0.4s ease-out;
+    background: linear-gradient(135deg, #fff9e6, #fff5e6);
+    border-left: 4px solid #ff9800;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #e65100;
+}
+
+.section-highlight.show {
+    display: block;
+}
+
+.section-highlight.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+.requirement-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f0f8ff;
+    border-left: 4px solid #00A693;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    animation: slideDown 0.5s ease-out;
+}
+
+.requirement-icon {
+    font-size: 1.2em;
+    width: 24px;
+    text-align: center;
+}
+
+.requirement-icon.unchecked {
+    color: #ff9800;
+}
+
+.requirement-icon.checked {
+    color: #4caf50;
+}
+
+/* ERROR MODAL STYLES */
+.error-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInError 0.3s ease-out;
+}
+
+.error-modal-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(244, 67, 54, 0.3);
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-left: 5px solid #f44336;
+}
+
+.error-modal-content h3 {
+    color: #f44336;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.error-modal-content p {
+    color: var(--text);
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.error-modal-content button {
+    background: var(--button-bg);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.error-modal-content button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,166,147,0.4);
+}
+
+.error-icon {
+    font-size: 3em;
+    color: #f44336;
+    margin-bottom: 10px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes fadeInError {
+    from {
+        opacity: 0;
+        background: rgba(0,0,0,0);
+    }
+    to {
+        opacity: 1;
+        background: rgba(0,0,0,0.6);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* LRN VERIFICATION MODAL STYLES */
+.lrn-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 3500;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInError 0.3s ease-out;
+}
+
+.lrn-modal-content {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,166,147,0.3);
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-top: 5px solid #00A693;
+}
+
+.lrn-modal-content h3 {
+    color: #00A693;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.4em;
+}
+
+.student-name-display {
+    background: #f0f8ff;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid #00A693;
+    font-weight: 600;
+    color: #003f39;
+}
+
+.lrn-input-wrapper {
+    margin: 25px 0;
+}
+
+.lrn-label {
+    display: block;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.lrn-input-field {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #b5d8d2;
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 1.1em;
+    letter-spacing: 2px;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.lrn-input-field:focus {
+    outline: none;
+    border-color: #00A693;
+    box-shadow: 0 0 0 3px rgba(0,166,147,0.2);
+    background: var(--input-bg);
+}
+
+.lrn-input-field::placeholder {
+    color: #999;
+    letter-spacing: 0;
+}
+
+.lrn-info {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+.lrn-modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+    justify-content: center;
+}
+
+.lrn-modal-buttons button {
+    padding: 11px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-size: 0.95em;
+}
+
+.lrn-verify-btn {
+    background: var(--button-bg);
+    color: white;
+    flex: 1;
+    max-width: 180px;
+}
+
+.lrn-verify-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,166,147,0.4);
+}
+
+.lrn-verify-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.lrn-cancel-btn {
+    background: #e0e0e0;
+    color: #333;
+    flex: 1;
+    max-width: 180px;
+}
+
+.lrn-cancel-btn:hover {
+    background: #d0d0d0;
+}
+
+.lrn-error-msg {
+    display: none;
+    background: #ffe6e6;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-weight: 600;
+    border-left: 4px solid #f44336;
+    animation: shake 0.5s ease-in-out;
+}
+
+.lrn-error-msg.show {
+    display: block;
+}
+
+.lrn-success-msg {
+    display: none;
+    background: #e6f7f5;
+    color: #1b5e20;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-weight: 600;
+    border-left: 4px solid #4caf50;
+}
+
+.lrn-success-msg.show {
+    display: block;
+}
+</style>
+
+<!-- STUDENT TYPE SELECTION MODAL -->
+<style>
+.student-type-modal {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.student-type-content {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+    animation: slideDown 0.4s ease-out;
+}
+
+.student-type-content h2 {
+    color: #00A693;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+}
+
+.student-type-content p {
+    color: var(--text);
+    margin: 15px 0;
+    opacity: 0.8;
+    font-size: 1em;
+}
+
+.type-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+.type-btn {
+    flex: 1;
+    padding: 15px 25px;
+    border: 2px solid #00A693;
+    background: transparent;
+    color: #00A693;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.type-btn:hover {
+    background: #00A693;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,166,147,0.3);
+}
+
+.type-btn.selected {
+    background: #00A693;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- STUDENT TYPE SELECTION MODAL -->
+<div class="student-type-modal" id="studentTypeModal">
+    <div class="student-type-content">
+        <h2>Student Type</h2>
+        <p>Are you a new/transferee student or an old student?</p>
+        <div class="type-buttons">
+            <button class="type-btn" onclick="selectStudentType('new')">
+                📝 New/Transferee
+            </button>
+            <button class="type-btn" onclick="selectStudentType('old')">
+                📚 Old Student
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="header">
+    <a href="#" class="logo-button">
+        <div class="logo"><img src="sha_logo.png"></div>
+        <div class="school-name">Sacred Heart Academy of Sta. Maria (Bulacan), Inc.</div>
+    </a>
+    <button class="dark-btn" onclick="toggleDarkMode()" id="modeBtn">🌙 Dark Mode</button>
+</div>
+
+<div class="question-section">
+<h2>Verification</h2>
+
+<!-- REQUIREMENT CHECKLIST -->
+<div id="requirementsList" style="margin-bottom: 25px;"></div>
+
+<div class="requirement-label">
+    <span class="requirement-icon unchecked" id="gradeIcon">◯</span>
+    <span><span class="required">Step 1:</span> Select your grade level (Grade 11 or 12)</span>
+</div>
+<p><span class="required">What grade are you applying for?</span></p>
+<input type="radio" name="gradeLevel" value="11" onclick="updateRequirements()"> Grade 11  
+<input type="radio" name="gradeLevel" value="12" onclick="updateRequirements()"> Grade 12
+
+<div class="section-highlight" id="gradeSelected">
+    ✓ Grade level selected! Now choose your student type below.
+</div>
+
+<div class="requirement-label" id="studentTypeLabel" style="display: none; margin-top: 25px;">
+    <span class="requirement-icon unchecked" id="studentIcon">◯</span>
+    <span><span class="required">Step 2:</span> Tell us if you're a new or old student</span>
+</div>
+<div id="studentTypeSection" style="display: none;">
+<p><span class="required">Are you a new or old student?</span></p>
+<input type="radio" name="studentType" value="new" onclick="updateRequirements()"> New/Transferee
+<input type="radio" name="studentType" value="old" onclick="updateRequirements()"> Old Student
+
+<div class="section-highlight" id="studentSelected">
+    ✓ Student type selected! Proceed with the next step below.
+</div>
+</div>
+
+<div id="oldStudentSearch" style="display:none; margin-top:15px; animation: slideDown 0.4s ease-out;">
+  <div class="requirement-label">
+    <span class="requirement-icon unchecked" id="searchIcon">◯</span>
+    <span><span class="required">Step 3:</span> Search and select your name from the records</span>
+  </div>
+  <p><span class="required">Search Old Student Name:</span></p>
+  <input type="text" id="oldStudentInput" placeholder="Last Name, First Name, Middle Name" oninput="filterStudents()">
+  <small style="opacity:0.7;">Type to search and select your name from the records.</small>
+
+  <ul id="studentList" style="list-style:none; padding-left:0; max-height:150px; overflow-y:auto; border:1px solid #b5d8d2; border-radius:5px; margin-top:5px; display:none;"></ul>
+</div>
+
+<div id="strandSection" style="display:none; margin-top:20px; animation: slideDown 0.4s ease-out;">
+<div class="requirement-label">
+    <span class="requirement-icon unchecked" id="strandIcon">◯</span>
+    <span><span class="required">Step 3a:</span> Select your preferred strand</span>
+</div>
+<p><span class="required">Select your preferred Strand:</span></p>
+<input type="radio" name="strand" value="stem" onclick="updateRequirements()"> STEM<br>
+<input type="radio" name="strand" value="abm" onclick="updateRequirements()"> ABM<br>
+<input type="radio" name="strand" value="humss" onclick="updateRequirements()"> HUMSS<br>
+<input type="radio" name="strand" value="gas" onclick="updateRequirements()"> GAS<br>
+<input type="radio" name="strand" value="tvl-ict" onclick="updateRequirements()"> TVL/ICT<br>
+<input type="radio" name="strand" value="tvl-he" onclick="updateRequirements()"> TVL/HE
+
+<div class="section-highlight" id="strandSelected">
+    ✓ Strand selected! Proceed with the next step below.
+</div>
+</div>
+
+<!-- GRADE REQUIREMENTS SECTION -->
+<div id="gradeRequirementsSection" style="display:none; margin-top:20px; animation: slideDown 0.4s ease-out;">
+<div class="requirement-label">
+    <span class="requirement-icon unchecked" id="gradeRequirementIcon">◯</span>
+    <span><span class="required">Step 3b:</span> Enter your average grades (Science & Math)</span>
+</div>
+<p style="font-weight: 600; color: #ff9800; background: #fff9e6; padding: 10px; border-radius: 6px; margin: 15px 0;">
+  ⚠ Minimum requirement: Average of 85 in Science and Math combined
+</p>
+<div class="row">
+    <div class="col form-group">
+        <label class="required">Science Grade:</label>
+        <input type="number" id="scienceGrade" placeholder="Enter your Science grade" min="0" max="100" step="0.01" oninput="updateRequirements()">
+    </div>
+    <div class="col form-group">
+        <label class="required">Math Grade:</label>
+        <input type="number" id="mathGrade" placeholder="Enter your Math grade" min="0" max="100" step="0.01" oninput="updateRequirements()">
+    </div>
+</div>
+<div id="gradeAverageDisplay" style="display:none; margin-top:15px; padding: 12px; border-radius: 8px; background: #f0f8ff; border-left: 4px solid #00A693; font-weight: 600;">
+    <span id="averageText"></span>
+</div>
+
+<div class="section-highlight" id="gradeQualified" style="display:none; background: linear-gradient(135deg, #e6f7f5, #d4f1e6); border-color: #4caf50; color: #1b5e20;">
+    ✓ Grade qualification met! You're all set. Click Next to continue.
+</div>
+
+<div class="section-highlight" id="gradeNotQualified" style="display:none; background: linear-gradient(135deg, #ffe6e6, #ffcccc); border-color: #f44336; color: #c62828;">
+    ✗ Grade average is below 85. Please review your grades.
+</div>
+</div>
+
+<button class="next-button" onclick="validateForm()">Next</button>
+</div>
+
+<!-- ERROR MODAL -->
+<div id="errorModal" class="error-modal">
+<div class="error-modal-content">
+    <div class="error-icon">⚠</div>
+    <h3>Input Required</h3>
+    <p id="errorMessage"></p>
+    <button onclick="closeErrorModal()">OK</button>
+</div>
+</div>
+
+<!-- LRN VERIFICATION MODAL -->
+<div id="lrnModal" class="lrn-modal">
+<div class="lrn-modal-content">
+    <h3>Student Verification</h3>
+    <p style="color: #666; margin-bottom: 20px;">Please verify your identity with your LRN</p>
+    
+    <div class="student-name-display">
+        <div style="font-size: 0.85em; color: #999; margin-bottom: 5px;">Confirmed Student Name</div>
+        <div id="confirmedStudentName" style="font-size: 1.1em;"></div>
+    </div>
+    
+    <div class="lrn-input-wrapper">
+        <label class="lrn-label">Enter your LRN (Learning Record Number)</label>
+        <input type="text" id="lrnInput" class="lrn-input-field" placeholder="Enter numbers only" maxlength="12" inputmode="numeric">
+        <div class="lrn-info">12-digit numeric identification number</div>
+    </div>
+    
+    <div id="lrnErrorMsg" class="lrn-error-msg">❌ Incorrect LRN. Please try again.</div>
+    <div id="lrnSuccessMsg" class="lrn-success-msg">✓ Identity verified successfully!</div>
+    
+    <div class="lrn-modal-buttons">
+        <button class="lrn-verify-btn" onclick="verifyLRN()">Verify LRN</button>
+        <button class="lrn-cancel-btn" onclick="closeLRNModal()">Cancel</button>
+    </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div id="dataPrivacyModal" class="modal">
+<div class="modal-content">
+<h2>Data Privacy Consent</h2>
+
+<div class="privacy-text">
+<p>
+Sacred Heart Academy of Sta. Maria (Bulacan), Inc. is committed to respect and value the privacy rights of individuals. We will ensure that all personal data are protected and processed in accordance with Republic Act No. 10173 or the Data Privacy Act of 2012 and its Implementing Rules and Regulations. We recognize the confidentiality of personal data and adhere to the general principles of transparency, legitimate purpose, and proportionality.
+</p>
+
+<p>
+Sacred Heart Academy of Sta. Maria (Bulacan), Inc is registered as a Personal Information Controller (PIC) with the National Privacy Commission under the Data Privacy Act of 2012 (DPA). As an applicant for enrollment, we will collect and process your personal data that you knowingly and voluntarily provide during or in connection with your enrollment with us, or where legitimate educational or institutional interests exists as determined by Sacred Heart Academy of Sta. Maria (Bulacan), Inc or as may be provided under the law.
+</p>
+
+<p>
+Your personal data that Sacred Heart Academy of Sta. Maria (Bulacan), Inc shall collect in electronic or paper form may include, but not limited to:
+</p>
+
+<p>
+a) name or alias, gender, date of birth, nationality, and country and city of birth.<br>
+b) home address, mailing address, telephone numbers, email address and other contact details.<br>
+c) academic history.<br>
+d) financial information and bank account details.<br>
+e) details of your parents or guardians, next-of-kin, spouse, and other family members.<br>
+f) health issues and disabilities.<br>
+g) photographs and other audio-visual information.<br>
+h) performance assessments and disciplinary records; and<br>
+i) any additional information provided to us by you during your enrollment.
+</p>
+
+<p>
+As a student of Sacred Heart Academy of Sta. Maria (Bulacan), Inc the data collected shall be used for legitimate purposes, such as but not limited to enrollment, academic progression, research and support services, student welfare and related support services, career services including references, work and other placements, alumni and public relations, and security and crime prevention.
+</p>
+
+<p>
+Sacred Heart Academy of Sta. Maria (Bulacan), Inc shall keep all personal data in strict confidentiality if such data are not intended for public disclosure. There will be instances however where sharing and disclosure will be undertaken pursuant to a legitimate academic purpose or as determined by Sacred Heart Academy of Sta. Maria (Bulacan), Inc School to promote your best interests. Sharing and disclosure shall include, but not limited to:
+</p>
+
+<p>
+a) Sharing of personal data and student records, including pre-existing medical conditions, student attendance, class performance, class schedule, grades, examination results, assessment examinations and aptitude tests (e.g. Entrance Examination, Mental Ability Test, and Qualifying Examinations), career assessment and the like, with:<br>
+i. your parents, guardians, or next-of-kin<br>
+ii. necessary Officers and Personnel of Sacred Heart Academy of Sta. Maria (Bulacan), Inc<br>
+iii. on a need-to-know basis as determined by Sacred Heart Academy of Sta. Maria (Bulacan), Inc<br>
+iv. as may be required by law
+</p>
+
+<p>
+b) Posting online (e.g., Sacred Heart Academy of Sta. Maria (Bulacan), Inc website, social media sites/platforms) and/or in school bulletin boards and other places within the premises of Sacred Heart Academy of Sta. Maria (Bulacan), Inc campus of:<br>
+i. class list and class schedules<br>
+ii. admission or acceptance to Sacred Heart Academy of Sta. Maria (Bulacan), Inc<br>
+iii. awarding of financial aid and scholarship grants
+</p>
+
+<p>
+c) Sharing of relevant data to potential donors, funders, or benefactors for purposes of scholarships, grants, and other forms of assistance including the distribution to donors, funders, or benefactors of scholar’s graduation brochure
+</p>
+
+<p>
+d) Publishing and distribution in brochures, tarpaulins, and other school publications and/or posting online (e.g., Sacred Heart Academy of Sta. Maria (Bulacan), Inc website, social media sites/platforms) and/or in school bulletin boards of:<br>
+i. list and photographs of graduates and awardees during commencement exercises<br>
+ii. academic, co-curricular and extracurricular achievements and success, including but not limited to honors lists, names of awardees, passing and topping of Board and Bar examinations
+</p>
+
+<p>
+e) Sharing of academic accomplishments, honors, co-curricular and extracurricular achievements with:<br>
+i. Schools you graduated from or were enrolled in<br>
+ii. Schools you intend to enroll in<br>
+iii. Award giving bodies as official entry of Sacred Heart Academy of Sta. Maria (Bulacan), Inc<br>
+iv. Employers and potential employers<br>
+v. Professional bodies or organizations<br>
+vi. Funding bodies
+</p>
+
+<p>
+f) Sharing of personal data and student records, including relevant medical information, with entities or organizations for determining eligibility in sports or academic competitions, and similar events
+</p>
+
+<p>
+g) Responding to inquiries of being a bona fide student or graduate of Sacred Heart Academy of Sta. Maria (Bulacan), Inc with scholastic ranking information including the issuance of a Certificate of Good Moral Character for purposes of transfer of schools, further studies, or application for employment
+</p>
+
+<p>
+h) Sharing of personal data and student records in the conduct of internal research, surveys, presentation, publication, and utilization of research output for purposes of institutional development
+</p>
+
+<p>
+i) Reporting and disclosing of pertinent data to the Department of Education (DepEd), National Privacy Commission (NPC), and other government agencies and regulatory bodies when required or allowed and mandated by law
+</p>
+
+<p>
+j) Sharing of personal data and school records in compliance with court orders, subpoenas, and other legal processes
+</p>
+
+<p>
+To ensure the proper functioning of Sacred Heart Academy of Sta. Maria (Bulacan), Inc as a Basic Education Institution, Sacred Heart Academy of Sta. Maria (Bulacan), Inc may share your personal data and school records with various Principals, Assistant Principals, Academic Heads and Heads of Non-Teaching Personnel Department, as well as necessary Officers and Personnel, to process grades, honors, awards, applications for scholarships, and the like; to impose disciplinary sanctions; and to administer the necessary health, medical and psychological examinations.
+</p>
+
+<p>
+Sacred Heart Academy of Sta. Maria (Bulacan), Inc may also, from time to time, consider it appropriate to disclose your relevant personal data and student records to members of staff committees and organizations within Sacred Heart Academy of Sta. Maria (Bulacan), Inc.
+</p>
+
+<p>
+If Sacred Heart Academy of Sta. Maria (Bulacan), Inc intends to use or share your personal data and/or student record for purposes other than for legitimate institutional and/or academic purposes and those above-described, Sacred Heart Academy of Sta. Maria (Bulacan), Inc shall obtain your written consent for that purpose, unless you yourself makes a specific request to process the personal data and/or student record for such purpose, or if such processing without your consent is allowed under the DPA or other laws, or where such disclosure is for the prevention or detection of crime, the apprehension or prosecution of offenders, or for the protection of your health, security and safety, and that of others.
+</p>
+
+
+<!-- end privacy-text -->
+
+<div class="agreement">
+    <input type="checkbox" id="consent1" onchange="toggleSingleConsent()">
+    <label for="consent1">
+        I have read and understood the contents of this Consent Form. As an applicant for enrollment or student of Sacred Heart Academy of Sta. Maria (Bulacan), Inc
+    </label>
+</div>
+
+<div class="agreement">
+    <input type="checkbox" id="consent2" onchange="toggleSingleConsent()">
+    <label for="consent2">
+        I give my written consent that Sacred Heart Academy of Sta. Maria (Bulacan), Inc may collect and process my personal data as set out above and/or for other legitimate purposes. In cases where my personal data was acquired by Sacred Heart Academy of Sta. Maria (Bulacan), Inc from a third party, I warrant that such third party has been duly authorized by me to disclose my personal data to Sacred Heart Academy of Sta. Maria (Bulacan), Inc pursuant to the purposes set out above. I also agree to comply with all reasonable requests of Sacred Heart Academy of Sta. Maria (Bulacan), Inc to enable compliance with its obligations under the Data Privacy Act or other applicable laws, regulations and/or guidelines.
+    </label>
+</div>
+
+<div class="agreement">
+    <input type="checkbox" id="agreeCheckbox" onchange="toggleAgreeAll()">
+    <label for="agreeCheckbox">
+        <strong>I agree to all</strong>
+    </label>
+</div>
+
+<button id="agreeBtn" onclick="confirmConsent()" disabled> Next</button>
+
+
+
+</div> 
+
+<script>
+// Handle Student Type Selection
+function selectStudentType(type) {
+    const modal = document.getElementById('studentTypeModal');
+    modal.style.display = 'none';
+    
+    // Set the student type radio button
+    document.querySelector(`input[name="studentType"][value="${type}"]`).checked = true;
+    
+    // Trigger the update requirements
+    updateRequirements();
+}
+
+// Check if student type was already selected
+window.addEventListener('load', () => {
+    const studentTypeRadio = document.querySelector('input[name="studentType"]:checked');
+    if (studentTypeRadio) {
+        document.getElementById('studentTypeModal').style.display = 'none';
+    }
+});
+
+function updateRequirements(){
+    // Get all selected values
+    const gradeSelected = document.querySelector('input[name="gradeLevel"]:checked');
+    const studentTypeSelected = document.querySelector('input[name="studentType"]:checked');
+    const strandSelected = document.querySelector('input[name="strand"]:checked');
+    const oldStudentInput = document.getElementById('oldStudentInput').value.trim();
+    const scienceGradeElement = document.getElementById('scienceGrade');
+    const mathGradeElement = document.getElementById('mathGrade');
+    const scienceGrade = scienceGradeElement ? scienceGradeElement.value : '';
+    const mathGrade = mathGradeElement ? mathGradeElement.value : '';
+    
+    // ========== STEP 1: Grade Level ==========
+    if (gradeSelected) {
+        document.getElementById('gradeIcon').textContent = '✓';
+        document.getElementById('gradeIcon').className = 'requirement-icon checked';
+        document.getElementById('gradeSelected').classList.add('show');
+        document.getElementById('studentTypeLabel').style.display = 'flex';
+        document.getElementById('studentTypeSection').style.display = 'block';
+    } else {
+        document.getElementById('gradeIcon').textContent = '◯';
+        document.getElementById('gradeIcon').className = 'requirement-icon unchecked';
+        document.getElementById('gradeSelected').classList.remove('show');
+        document.getElementById('studentTypeLabel').style.display = 'none';
+        document.getElementById('studentTypeSection').style.display = 'none';
+        // Hide all sections if no grade selected
+        document.getElementById('oldStudentSearch').style.display = 'none';
+        document.getElementById('strandSection').style.display = 'none';
+        document.getElementById('gradeRequirementsSection').style.display = 'none';
+        return;
+    }
+    
+    // ========== STEP 2: Student Type ==========
+    if (!studentTypeSelected) {
+        document.getElementById('studentIcon').textContent = '◯';
+        document.getElementById('studentIcon').className = 'requirement-icon unchecked';
+        document.getElementById('studentSelected').classList.remove('show');
+        document.getElementById('oldStudentSearch').style.display = 'none';
+        document.getElementById('strandSection').style.display = 'none';
+        document.getElementById('gradeRequirementsSection').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('studentIcon').textContent = '✓';
+    document.getElementById('studentIcon').className = 'requirement-icon checked';
+    document.getElementById('studentSelected').classList.add('show');
+    
+    // ========== OLD STUDENT PATH ==========
+    if (studentTypeSelected.value === 'old') {
+        document.getElementById('oldStudentSearch').style.display = 'block';
+        document.getElementById('strandSection').style.display = 'none';
+        document.getElementById('gradeRequirementsSection').style.display = 'none';
+        
+        // Update search icon
+        if (oldStudentInput) {
+            document.getElementById('searchIcon').textContent = '✓';
+            document.getElementById('searchIcon').className = 'requirement-icon checked';
+        } else {
+            document.getElementById('searchIcon').textContent = '◯';
+            document.getElementById('searchIcon').className = 'requirement-icon unchecked';
+        }
+        return;
+    }
+    
+    // ========== NEW STUDENT PATH ==========
+    document.getElementById('oldStudentSearch').style.display = 'none';
+    document.getElementById('strandSection').style.display = 'block';
+    
+    // ========== STEP 3a: Strand Selection ==========
+    if (!strandSelected) {
+        document.getElementById('strandIcon').textContent = '◯';
+        document.getElementById('strandIcon').className = 'requirement-icon unchecked';
+        document.getElementById('strandSelected').classList.remove('show');
+        document.getElementById('gradeRequirementsSection').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('strandIcon').textContent = '✓';
+    document.getElementById('strandIcon').className = 'requirement-icon checked';
+    document.getElementById('strandSelected').classList.add('show');
+    
+    // ========== STEP 3b: Grade Requirements (STEM ONLY) ==========
+    if (strandSelected.value === 'stem') {
+        document.getElementById('gradeRequirementsSection').style.display = 'block';
+        
+        // Calculate and display grade average
+        if (scienceGrade && mathGrade) {
+            const average = (parseFloat(scienceGrade) + parseFloat(mathGrade)) / 2;
+            document.getElementById('gradeAverageDisplay').style.display = 'block';
+            document.getElementById('averageText').textContent = `Your Average: ${average.toFixed(2)} (Science: ${scienceGrade}, Math: ${mathGrade})`;
+            
+            if (average >= 85) {
+                document.getElementById('gradeQualified').style.display = 'block';
+                document.getElementById('gradeNotQualified').style.display = 'none';
+                document.getElementById('gradeRequirementIcon').textContent = '✓';
+                document.getElementById('gradeRequirementIcon').className = 'requirement-icon checked';
+            } else {
+                document.getElementById('gradeQualified').style.display = 'none';
+                document.getElementById('gradeNotQualified').style.display = 'block';
+                document.getElementById('gradeRequirementIcon').textContent = '✗';
+                document.getElementById('gradeRequirementIcon').className = 'requirement-icon unchecked';
+                document.getElementById('gradeRequirementIcon').style.color = '#f44336';
+            }
+        } else {
+            document.getElementById('gradeAverageDisplay').style.display = 'none';
+            document.getElementById('gradeQualified').style.display = 'none';
+            document.getElementById('gradeNotQualified').style.display = 'none';
+            document.getElementById('gradeRequirementIcon').textContent = '◯';
+            document.getElementById('gradeRequirementIcon').className = 'requirement-icon unchecked';
+        }
+    } else {
+        // Non-STEM strands: Hide grade requirements section completely
+        document.getElementById('gradeRequirementsSection').style.display = 'none';
+        document.getElementById('gradeAverageDisplay').style.display = 'none';
+        document.getElementById('gradeQualified').style.display = 'none';
+        document.getElementById('gradeNotQualified').style.display = 'none';
+    }
+}
+
+// Example list of old students with LRN
+const oldStudents = [
+  { name: "Cabrera, Misha Denise F.", lrn: "123456789012" },
+  { name: "Reyes, Juan Miguel S.", lrn: "987654321098" },
+  { name: "Dela Cruz, Ana Marie G.", lrn: "555666777888" },
+  { name: "Santos, Mark Anthony P.", lrn: "111222333444" }
+];
+
+function filterStudents() {
+  const input = document.getElementById("oldStudentInput");
+  const filter = input.value.toLowerCase();
+  const list = document.getElementById("studentList");
+  list.innerHTML = '';
+
+  if (filter === '') {
+    list.style.display = 'none';
+    updateRequirements();
+    return;
+  }
+
+  const filtered = oldStudents.filter(student => student.name.toLowerCase().includes(filter));
+
+  filtered.forEach(student => {
+    const li = document.createElement('li');
+    li.textContent = student.name;
+    li.style.padding = "10px 10px";
+    li.style.cursor = "pointer";
+    li.style.borderBottom = "1px solid #eee";
+    li.onmouseover = () => li.style.backgroundColor = "#e0f7f5";
+    li.onmouseout = () => li.style.backgroundColor = "transparent";
+    li.onclick = () => {
+      input.value = student.name;
+      list.style.display = 'none';
+      selectedOldStudent = student;
+      updateRequirements();
+      setTimeout(() => {
+        openLRNModal(student.name);
+      }, 300);
+    };
+    list.appendChild(li);
+  });
+
+  list.style.display = filtered.length > 0 ? 'block' : 'none';
+}
+
+function validateForm(){
+    // Check if grade level is selected
+    const gradeSelected = document.querySelector('input[name="gradeLevel"]:checked');
+    if (!gradeSelected) {
+        animateError('gradeIcon');
+        return;
+    }
+    
+    // Check if student type is selected
+    const studentTypeSelected = document.querySelector('input[name="studentType"]:checked');
+    if (!studentTypeSelected) {
+        animateError('studentIcon');
+        return;
+    }
+    
+    // If old student is selected, verify they filled in the search and LRN
+    if (studentTypeSelected.value === 'old') {
+        const oldStudentInput = document.getElementById('oldStudentInput').value.trim();
+        if (!oldStudentInput) {
+            animateError('searchIcon');
+            return;
+        }
+        
+        // Check if LRN has been verified
+        if (!lrnVerified) {
+            showErrorModal('Please verify your identity with your LRN before proceeding.');
+            return;
+        }
+    } else {
+        // If new student, verify strand is selected
+        const strandSelected = document.querySelector('input[name="strand"]:checked');
+        if (!strandSelected) {
+            animateError('strandIcon');
+            return;
+        }
+        
+        // STEM strand requires grade validation
+        if (strandSelected.value === 'stem') {
+            const scienceGrade = parseFloat(document.getElementById('scienceGrade').value);
+            const mathGrade = parseFloat(document.getElementById('mathGrade').value);
+            
+            if (!scienceGrade || !mathGrade) {
+                showErrorModal('Please enter both Science and Math grades');
+                animateError('gradeIcon');
+                return;
+            }
+            
+            const average = (scienceGrade + mathGrade) / 2;
+            if (average < 85) {
+                animateError('gradeIcon');
+                showErrorModal(`Your average grade is ${average.toFixed(2)}. Minimum requirement is 85 for STEM strand. Please review your grades.`);
+                return;
+            }
+        }
+        
+        // Store selected strand
+        sessionStorage.setItem('strand', strandSelected.value);
+    }
+    
+    // Store selections in session storage for final.html
+    sessionStorage.setItem('gradeLevel', gradeSelected.value);
+    sessionStorage.setItem('studentType', studentTypeSelected.value);
+    
+    // Show privacy modal
+    document.getElementById("dataPrivacyModal").style.display="block";
+}
+
+function animateError(iconId) {
+    const icon = document.getElementById(iconId);
+    icon.parentElement.style.animation = 'none';
+    setTimeout(() => {
+        icon.parentElement.style.animation = 'shake 0.5s ease-in-out';
+    }, 10);
+}
+
+function toggleAgreeAll(){
+    const agreeAll = document.getElementById("agreeCheckbox").checked;
+    document.getElementById("consent1").checked = agreeAll;
+    document.getElementById("consent2").checked = agreeAll;
+    updateAgreeButton();
+}
+
+function toggleSingleConsent(){
+    const c1 = document.getElementById("consent1").checked;
+    const c2 = document.getElementById("consent2").checked;
+
+    document.getElementById("agreeCheckbox").checked = (c1 && c2);
+    updateAgreeButton();
+}
+
+function updateAgreeButton(){
+    const c1 = document.getElementById("consent1").checked;
+    const c2 = document.getElementById("consent2").checked;
+    const c3 = document.getElementById("agreeCheckbox").checked;
+
+    document.getElementById("agreeBtn").disabled = !(c1 && c2 && c3);
+}
+
+function confirmConsent(){
+    window.location.href="final.html";
+}
+
+function toggleDarkMode(){
+    document.body.classList.toggle("dark");
+    document.getElementById("modeBtn").innerHTML =
+        document.body.classList.contains("dark") ? "☀ Light Mode" : "🌙 Dark Mode";
+}
+
+function showErrorModal(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorModal').style.display = 'flex';
+}
+
+function closeErrorModal() {
+    document.getElementById('errorModal').style.display = 'none';
+}
+
+// Variable to store selected old student
+let selectedOldStudent = null;
+let lrnVerified = false;
+
+function openLRNModal(studentName) {
+    lrnVerified = false;
+    document.getElementById('confirmedStudentName').textContent = studentName;
+    document.getElementById('lrnInput').value = '';
+    document.getElementById('lrnInput').focus();
+    document.getElementById('lrnErrorMsg').classList.remove('show');
+    document.getElementById('lrnSuccessMsg').classList.remove('show');
+    document.getElementById('lrnModal').style.display = 'flex';
+}
+
+function closeLRNModal() {
+    document.getElementById('lrnModal').style.display = 'none';
+    document.getElementById('oldStudentInput').value = '';
+    selectedOldStudent = null;
+    lrnVerified = false;
+    updateRequirements();
+}
+
+function verifyLRN() {
+    const enteredLRN = document.getElementById('lrnInput').value.trim();
+    const errorMsg = document.getElementById('lrnErrorMsg');
+    const successMsg = document.getElementById('lrnSuccessMsg');
+    
+    errorMsg.classList.remove('show');
+    successMsg.classList.remove('show');
+    
+    // Check if LRN is entered
+    if (!enteredLRN) {
+        document.getElementById('lrnInput').focus();
+        return;
+    }
+    
+    // Check if LRN matches the selected student
+    if (selectedOldStudent && selectedOldStudent.lrn === enteredLRN) {
+        successMsg.classList.add('show');
+        lrnVerified = true;
+        
+        // Close modal after 1.5 seconds and proceed
+        setTimeout(() => {
+            document.getElementById('lrnModal').style.display = 'none';
+        }, 1500);
+    } else {
+        errorMsg.classList.add('show');
+        document.getElementById('lrnInput').value = '';
+        document.getElementById('lrnInput').focus();
+        
+        // Shake animation already applied via CSS
+    }
+}
+
+// Allow Enter key to verify
+document.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter' && document.getElementById('lrnModal').style.display === 'flex') {
+        verifyLRN();
+    }
+});
+
+// Filter out non-numeric input from LRN field
+document.addEventListener('DOMContentLoaded', function() {
+    const lrnInput = document.getElementById('lrnInput');
+    if (lrnInput) {
+        lrnInput.addEventListener('keypress', function(e) {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>

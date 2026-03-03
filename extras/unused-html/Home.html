@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sacred Heart Academy of Sta. Maria</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        /* ===== LOGIN BUTTON ===== */
+        .login-btn-top {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.35);
+        }
+
+        .login-btn-top:hover {
+            background: #00A693;
+            transform: translateY(-2px);
+        }
+
+        .center-content {
+            position: absolute;
+            top: 58%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            text-shadow: 0 0 10px black;
+            animation: fadeIn 1.8s ease-out;
+            white-space: nowrap;
+        }
+
+        .school-name-big {
+            font-size: 4.6rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            margin-bottom: 22px;
+            display: inline-block;
+            animation: bounceGlow 2.5s ease-in-out infinite;
+        }
+
+        .button-group {
+            margin-top: 55px;
+        }
+
+        .enroll-btn {
+            background-color: #00A693;
+            padding: 15px 45px;
+            color: white;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+
+        .enroll-btn:hover {
+            background-color: black;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bottom-nav {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 25px 0;
+            border-top: 2px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .bottom-nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.15rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+
+        .bottom-nav a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translate(-50%, -40%); }
+            100% { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        @keyframes bounceGlow {
+            0%, 100% {
+                transform: translateY(0);
+                text-shadow:
+                    0 0 6px rgba(255,255,255,0.7),
+                    0 0 14px rgba(0,255,225,0.6);
+            }
+            50% {
+                transform: translateY(-8px);
+                text-shadow:
+                    0 0 10px rgba(255,255,255,0.8),
+                    0 0 22px rgba(0,255,225,0.7);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="video-container">
+
+        <!-- LOGIN BUTTON -->
+        <a href="admin-login.html" class="login-btn-top">Login</a>
+
+        <video class="hero-video" src="WELCOME BACK, BATCH 2026!.mp4" autoplay muted loop></video>
+
+        <div class="center-content">
+            <div class="school-name-big">Welcome Back, SHAns!</div>
+
+            <div class="button-group">
+                <a href="verification.html" class="enroll-btn">Enroll Now</a>
+            </div>
+        </div>
+    </section>
+
+    <section style="min-height:60vh; padding-top:40px;">
+        <div class="bottom-nav">
+            <a href="Home.html">Home</a>
+            <a href="About Us.html">About Us</a>
+            <a href="Contact Us.html">Contact Us</a>
+            <a href="SHS Program.html">SHS Program</a>
+        </div>
+    </section>
+
+</body>
+</html>

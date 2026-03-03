@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Student Records</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            background: linear-gradient(135deg, #e9ffff, #ffffff, #e0faf6);
+            color: #003f39;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00A693, #008f80);
+            color: white;
+            padding: 14px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        .logo-button {
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 58px;
+            margin-right: 12px;
+        }
+
+        .school-name {
+            font-size: 1.25em;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* FILTER SECTION */
+        .filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #003f39;
+            min-width: 120px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #b5d8d2;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #00A693;
+            box-shadow: 0 0 8px rgba(0,166,147,0.3);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-filter {
+            padding: 10px 18px;
+            border: 2px solid #00A693;
+            background: white;
+            color: #00A693;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .btn-filter.active {
+            background: #00A693;
+            color: white;
+        }
+
+        .btn-filter:hover {
+            background: #00A693;
+            color: white;
+        }
+
+        /* STATS SECTION */
+        .stats-section {
+            margin-bottom: 30px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 4px solid #00A693;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #00A693;
+        }
+
+        /* RECORDS TABLE */
+        .records-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .records-header {
+            background: #00A693;
+            color: white;
+            padding: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .records-count {
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        #tableContainer {
+            overflow-x: auto;
+        }
+
+        /* Fixed Header and Columns Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: #f5f5f5;
+        }
+
+        th {
+            background: #f5f5f5 !important;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            color: #003f39;
+            font-size: 0.95em;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        /* First 7 columns fixed */
+        th:nth-child(1), th:nth-child(2), th:nth-child(3), 
+        th:nth-child(4), th:nth-child(5), th:nth-child(6), 
+        th:nth-child(7) {
+            position: sticky;
+            z-index: 21;
+            background: #f5f5f5 !important;
+        }
+
+        th:nth-child(1) { left: 0; min-width: 90px; max-width: 90px; }
+        th:nth-child(2) { left: 90px; min-width: 90px; max-width: 90px; }
+        th:nth-child(3) { left: 180px; min-width: 220px; max-width: 220px; }
+        th:nth-child(4) { left: 400px; min-width: 80px; max-width: 80px; }
+        th:nth-child(5) { left: 480px; min-width: 100px; max-width: 100px; }
+        th:nth-child(6) { left: 580px; min-width: 90px; max-width: 90px; }
+        th:nth-child(7) { left: 670px; min-width: 100px; max-width: 100px; }
+
+        td {
+            padding: 15px;
+            font-size: 0.95em;
+        }
+
+        /* First 7 table data columns fixed */
+        td:nth-child(1), td:nth-child(2), td:nth-child(3), 
+        td:nth-child(4), td:nth-child(5), td:nth-child(6), 
+        td:nth-child(7) {
+            position: sticky;
+            background: white !important;
+            z-index: 18;
+        }
+
+        td:nth-child(1) { left: 0; min-width: 90px; max-width: 90px; }
+        td:nth-child(2) { left: 90px; min-width: 90px; max-width: 90px; }
+        td:nth-child(3) { left: 180px; min-width: 220px; max-width: 220px; }
+        td:nth-child(4) { left: 400px; min-width: 80px; max-width: 80px; }
+        td:nth-child(5) { left: 480px; min-width: 100px; max-width: 100px; }
+        td:nth-child(6) { left: 580px; min-width: 90px; max-width: 90px; }
+        td:nth-child(7) { left: 670px; min-width: 100px; max-width: 100px; }
+
+        /* Gender Filter Column */
+        td:nth-child(5) {
+            cursor: pointer;
+            color: #00A693;
+            font-weight: 600;
+        }
+
+        td:nth-child(5):hover {
+            background: #e8f5f5;
+            border-radius: 4px;
+        }
+
+        tbody tr:hover td:nth-child(1), 
+        tbody tr:hover td:nth-child(2),
+        tbody tr:hover td:nth-child(3),
+        tbody tr:hover td:nth-child(4),
+        tbody tr:hover td:nth-child(5),
+        tbody tr:hover td:nth-child(6),
+        tbody tr:hover td:nth-child(7) {
+            background: #f5f5f5;
+        }
+
+        tbody tr:hover td {
+            background: #f9f9f9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .btn-view {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #2563EB;
+        }
+
+        .btn-edit {
+            background: #FFA500;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #FF9500;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+        }
+
+        .strand-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stem { background: #DBEAFE; color: #1e40af; }
+        .humss { background: #F3E8FF; color: #6b21a8; }
+        .abm { background: #FFF3E0; color: #f57c00; }
+        .tvl-ict { background: #E8F5E9; color: #388e3c; }
+        .tvl-he { background: #E8F5E9; color: #388e3c; }
+        .gas { background: #FCE7F3; color: #be185d; }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            color: #00A693;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        /* CHARTS SECTION */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #003f39;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-title i {
+            color: #00A693;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #00A693;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #003f39;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #b5d8d2;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: "Poppins", Arial, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00A693;
+            box-shadow: 0 0 8px rgba(0,166,147,0.3);
+        }
+
+        .form-group input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .btn-save {
+            background: #00A693;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #008f80;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background: #d0d0d0;
+        }
+
+        .view-field {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .view-field:last-child {
+            border-bottom: none;
+        }
+
+        .view-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .view-value {
+            font-size: 1.1em;
+            color: #003f39;
+        }
+
+        /* LOGOUT CONFIRMATION MODAL */
+        .logout-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .logout-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logout-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .logout-icon {
+            font-size: 4em;
+            color: #FF6B35;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .logout-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #003f39;
+            margin-bottom: 15px;
+        }
+
+        .logout-message {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .logout-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .logout-btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .logout-btn-confirm {
+            background: #FF6B35;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .logout-btn-confirm:hover {
+            background: #FF5520;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+        }
+
+        .logout-btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .logout-btn-cancel:hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .filter-buttons {
+                width: 100%;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .btn-action {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="logo-name">
+        <div class="logo-button">
+            <div class="logo">
+                <img src="sha_logo.png" alt="SHA Logo">
+            </div>
+            <div class="school-name">Sacred Heart Academy of Santa Maria (Bulacan) Inc.</div>
+        </div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="window.location.href='enrollment-records.html'" style="background: #00A693; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#008f80'" onmouseout="this.style.background='#00A693'">Enrollment Records</button>
+        <button onclick="logout()" style="background: #FF6B35; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#FF5520'" onmouseout="this.style.background='#FF6B35'">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+    <!-- FILTER SECTION -->
+    <div class="filter-section">
+        <!-- Gender Filter -->
+        <div class="filter-row">
+            <span class="filter-label">Gender:</span>
+            <div class="filter-buttons">
+                <button class="btn-filter active" onclick="filterByGender('all')">All</button>
+                <button class="btn-filter" onclick="filterByGender('male')">Male</button>
+                <button class="btn-filter" onclick="filterByGender('female')">Female</button>
+            </div>
+        </div>
+
+        <!-- Grade Level Filter -->
+        <div class="filter-row">
+            <span class="filter-label">Grade Level:</span>
+            <div class="filter-buttons">
+                <button class="btn-filter active" onclick="filterByGrade('all')">All</button>
+                <button class="btn-filter" onclick="filterByGrade('11')">Grade 11</button>
+                <button class="btn-filter" onclick="filterByGrade('12')">Grade 12</button>
+            </div>
+        </div>
+
+        <!-- Strand Filter -->
+        <div class="filter-row">
+            <span class="filter-label">Strand:</span>
+            <div class="filter-buttons">
+                <button class="btn-filter active" onclick="filterByStrand('all')">All</button>
+                <button class="btn-filter" onclick="filterByStrand('stem')">STEM</button>
+                <button class="btn-filter" onclick="filterByStrand('abm')">ABM</button>
+                <button class="btn-filter" onclick="filterByStrand('humss')">HUMSS</button>
+                <button class="btn-filter" onclick="filterByStrand('gas')">GAS</button>
+                <button class="btn-filter" onclick="filterByStrand('tvl-ict')">TVL ICT</button>
+                <button class="btn-filter" onclick="filterByStrand('tvl-he')">TVL HE</button>
+            </div>
+        </div>
+
+        <!-- Enrollment Date Filter -->
+        <div class="filter-row">
+            <span class="filter-label">Enrollment:</span>
+            <div class="filter-buttons">
+                <button class="btn-filter" id="dashboardFilterNewBtn" onclick="filterByEnrollmentDate('new')" style="background: white; color: #00A693; border: 2px solid #00A693;">
+                    Newest
+                </button>
+                <button class="btn-filter" id="dashboardFilterOldBtn" onclick="filterByEnrollmentDate('old')" style="background: white; color: #00A693; border: 2px solid #00A693;">
+                    Oldest
+                </button>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="filter-row">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search students by name, LRN, or email..." onkeyup="searchStudents()">
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-section">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Students</div>
+                <div class="stat-value" id="totalCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Male</div>
+                <div class="stat-value" id="maleCount" style="color: #3B82F6;">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Female</div>
+                <div class="stat-value" id="femaleCount" style="color: #EC4899;">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Today's Enrollments</div>
+                <div class="stat-value" id="todayCount" style="color: #10B981;">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECORDS TABLE -->
+    <div class="records-section">
+        <div class="records-header">
+            <span>Student Records</span>
+            <span class="records-count" id="recordsCount">Students: 0</span>
+        </div>
+        <div id="tableContainer"></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-section">
+        <div class="chart-card">
+            <div class="chart-title">Strand Distribution</div>
+            <div class="chart-container">
+                <canvas id="strandChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">Gender Distribution</div>
+            <div class="chart-container">
+                <canvas id="genderChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPORT SECTION -->
+    <div style="margin-top: 30px; text-align: center;">
+        <button class="btn-action" style="background: #006b63; color: white; padding: 12px 30px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#004d47'" onmouseout="this.style.background='#006b63'" onclick="exportStudentsToCSV()">
+            Export to CSV
+        </button>
+    </div>
+</div>
+
+<!-- LOGOUT CONFIRMATION MODAL -->
+<div id="logoutModal" class="logout-modal">
+    <div class="logout-content">
+        <div class="logout-icon">
+        </div>
+        <div class="logout-title">Logout Confirmation</div>
+        <div class="logout-message">
+            Are you sure you want to logout? You will be redirected to the home page.
+        </div>
+        <div class="logout-buttons">
+            <button class="logout-btn logout-btn-confirm" onclick="confirmLogout()">
+                Yes, Logout
+            </button>
+            <button class="logout-btn logout-btn-cancel" onclick="cancelLogout()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div id="viewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Student Information</span>
+            <button class="close-modal" onclick="closeViewModal()">&times;</button>
+        </div>
+        <div id="viewModalBody"></div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Edit Student Information</span>
+            <button class="close-modal" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form id="editForm" onsubmit="saveStudent(event)">
+            <!-- Student Information Section -->
+            <h3 style="color: #00A693; margin-bottom: 15px; margin-top: 20px; border-bottom: 2px solid #00A693; padding-bottom: 10px;">Student Information</h3>
+            
+            <div class="form-group">
+                <label>LRN (Learner Reference Number)</label>
+                <input type="text" id="editLRN" required>
+            </div>
+            
+            <div class="form-group">
+                <label>School Year</label>
+                <input type="text" id="editSchoolYear" placeholder="e.g. 2025-2026" required>
+            </div>
+            
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="editFirstName" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Middle Name</label>
+                <input type="text" id="editMiddleName">
+            </div>
+            
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="editLastName" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Suffix (e.g Sr., Jr., II)</label>
+                <input type="text" id="editSuffix" placeholder="N/A if none">
+            </div>
+            
+            <div class="form-group">
+                <label>Sex</label>
+                <select id="editGender" required>
+                    <option value="">Select Sex</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="editDateOfBirth">
+            </div>
+            
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="editAge" min="13" max="25" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="tel" id="editContact" placeholder="09123456789" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="editEmail" required>
+            </div>
+            
+            <div class="form-group">
+                <label>School Last Attended</label>
+                <input type="text" id="editSchoolLastAttended" required>
+            </div>
+            
+            <div class="form-group">
+                <label>General Weighted Average (GWA)</label>
+                <input type="number" id="editGWA" step="0.01" placeholder="e.g. 88.50" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Grade Level</label>
+                <select id="editGrade" required>
+                    <option value="">Select Grade</option>
+                    <option value="11">Grade 11</option>
+                    <option value="12">Grade 12</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Strand</label>
+                <select id="editStrand" required>
+                    <option value="">Select Strand</option>
+                    <option value="stem">STEM</option>
+                    <option value="humss">HUMSS</option>
+                    <option value="abm">ABM</option>
+                    <option value="gas">GAS</option>
+                    <option value="tvl-ict">TVL ICT</option>
+                    <option value="tvl-he">TVL HE</option>
+                </select>
+            </div>
+
+            <!-- Parents Information Section -->
+            <h3 style="color: #00A693; margin-bottom: 15px; margin-top: 25px; border-bottom: 2px solid #00A693; padding-bottom: 10px;">Parents Information</h3>
+            
+            <div class="form-group">
+                <label>Father's Name</label>
+                <input type="text" id="editFatherName">
+            </div>
+            
+            <div class="form-group">
+                <label>Father's Contact Number</label>
+                <input type="tel" id="editFatherContact" placeholder="09123456789">
+            </div>
+            
+            <div class="form-group">
+                <label>Is Father an Alumni?</label>
+                <select id="editFatherAlumni">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Mother's Name</label>
+                <input type="text" id="editMotherName">
+            </div>
+            
+            <div class="form-group">
+                <label>Mother's Contact Number</label>
+                <input type="tel" id="editMotherContact" placeholder="09123456789">
+            </div>
+            
+            <div class="form-group">
+                <label>Is Mother an Alumni?</label>
+                <select id="editMotherAlumni">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+            <!-- Address Section -->
+            <h3 style="color: #00A693; margin-bottom: 15px; margin-top: 25px; border-bottom: 2px solid #00A693; padding-bottom: 10px;">Address</h3>
+            
+            <div class="form-group">
+                <label>House No. / Full Address</label>
+                <input type="text" id="editHouseAddress" placeholder="House No., Street, Subdivision (if any)">
+            </div>
+            
+            <div class="form-group">
+                <label>Province</label>
+                <input type="text" id="editProvince">
+            </div>
+            
+            <div class="form-group">
+                <label>City/Municipality</label>
+                <input type="text" id="editCity">
+            </div>
+            
+            <div class="form-group">
+                <label>Barangay</label>
+                <input type="text" id="editBarangay">
+            </div>
+
+            <!-- Payment / Voucher Category Section -->
+            <h3 style="color: #00A693; margin-bottom: 15px; margin-top: 25px; border-bottom: 2px solid #00A693; padding-bottom: 10px;">Payment / Voucher Category</h3>
+            
+            <div class="form-group">
+                <label>Select Payment Category</label>
+                <select id="editPaymentCategory" required>
+                    <option value="">Select Payment Category</option>
+                    <option value="ECS">ECS</option>
+                    <option value="Non-ECS (Approved Online)">Non-ECS (Approved On-line)</option>
+                    <option value="Public">Public</option>
+                    <option value="Payee">Payee</option>
+                    <option value="ALS / A&E Passer">ALS / A&E Passer</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>ALS / A&E Passer</label>
+                <select id="editALS" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes, ALS / A&E Passer</option>
+                </select>
+            </div>
+
+            <!-- Emergency Contact Section -->
+            <h3 style="color: #00A693; margin-bottom: 15px; margin-top: 25px; border-bottom: 2px solid #00A693; padding-bottom: 10px;">Emergency Contact Person</h3>
+            
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="editEmergencyName">
+            </div>
+            
+            <div class="form-group">
+                <label>Relationship</label>
+                <input type="text" id="editEmergencyRelationship">
+            </div>
+            
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="tel" id="editEmergencyContact" placeholder="09123456789">
+            </div>
+
+            <div class="modal-buttons">
+                <button type="submit" class="modal-buttons button btn-save">Save Changes</button>
+                <button type="button" class="modal-buttons button btn-cancel" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Check authentication on page load
+function checkAuth() {
+    const adminUser = localStorage.getItem('adminUser');
+    if (!adminUser) {
+        // Redirect to login if not authenticated
+        window.location.href = 'admin-login.html';
+        return;
+    }
+    
+    // Optional: Display admin username if desired
+    try {
+        const admin = JSON.parse(adminUser);
+        console.log('Logged in as:', admin.username);
+    } catch (e) {
+        console.error('Error parsing admin user data:', e);
+    }
+}
+
+// Check auth on page load
+checkAuth();
+
+let allStudents = [];
+let filteredStudents = [];
+let currentGradeFilter = 'all';
+let currentStrandFilter = 'all';
+let currentGenderFilter = 'all';
+let currentEnrollmentDateFilter = null;
+let chartInstances = {};
+
+// Load data on page load
+async function loadData() {
+    try {
+        const response = await fetch('/api/enrollments');
+        allStudents = await response.json();
+        filteredStudents = allStudents;
+        renderTable();
+        updateStats();
+        updateCharts();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('tableContainer').innerHTML = `
+            <div class="empty-state">
+                <p>Error loading students. Please check your connection.</p>
+            </div>
+        `;
+    }
+}
+
+function filterByGender(gender) {
+    currentGenderFilter = gender;
+    // Update button styling
+    document.querySelectorAll('.filter-row:nth-child(1) .btn-filter').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    applyFilters();
+}
+
+function filterByEnrollmentDate(order) {
+    currentEnrollmentDateFilter = order;
+    applyFilters();
+    
+    // Update button styling
+    if (order === 'new') {
+        document.getElementById('dashboardFilterNewBtn').style.background = '#00A693';
+        document.getElementById('dashboardFilterNewBtn').style.color = 'white';
+        document.getElementById('dashboardFilterNewBtn').style.border = 'none';
+        document.getElementById('dashboardFilterOldBtn').style.background = 'white';
+        document.getElementById('dashboardFilterOldBtn').style.color = '#00A693';
+        document.getElementById('dashboardFilterOldBtn').style.border = '2px solid #00A693';
+    } else {
+        document.getElementById('dashboardFilterNewBtn').style.background = 'white';
+        document.getElementById('dashboardFilterNewBtn').style.color = '#00A693';
+        document.getElementById('dashboardFilterNewBtn').style.border = '2px solid #00A693';
+        document.getElementById('dashboardFilterOldBtn').style.background = '#00A693';
+        document.getElementById('dashboardFilterOldBtn').style.color = 'white';
+        document.getElementById('dashboardFilterOldBtn').style.border = 'none';
+    }
+}
+
+function filterByGrade(grade) {
+    currentGradeFilter = grade;
+    
+    // Update button styling
+    document.querySelectorAll('.filter-row:nth-child(2) .btn-filter').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    applyFilters();
+}
+
+function filterByStrand(strand) {
+    currentStrandFilter = strand;
+    
+    // Update button styling
+    document.querySelectorAll('.filter-row:nth-child(3) .btn-filter').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    applyFilters();
+}
+
+function applyFilters() {
+    filteredStudents = allStudents.filter(student => {
+        const gradeMatch = currentGradeFilter === 'all' || student.studentInfo.gradeLevel === currentGradeFilter;
+        const strandMatch = currentStrandFilter === 'all' || student.studentInfo.strand === currentStrandFilter;
+        const genderMatch = currentGenderFilter === 'all' || student.studentInfo.sex === currentGenderFilter;
+        return gradeMatch && strandMatch && genderMatch;
+    });
+    
+    // Sort by enrollment date if filter is active
+    if (currentEnrollmentDateFilter === 'new') {
+        filteredStudents.sort((a, b) => new Date(b.enrollmentDate) - new Date(a.enrollmentDate));
+    } else if (currentEnrollmentDateFilter === 'old') {
+        filteredStudents.sort((a, b) => new Date(a.enrollmentDate) - new Date(b.enrollmentDate));
+    }
+    
+    renderTable();
+    updateStats();
+    updateCharts();
+}
+
+function searchStudents() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    filteredStudents = allStudents.filter(student => {
+        const s = student.studentInfo;
+        return (s.firstName + ' ' + s.lastName).toLowerCase().includes(searchTerm) ||
+               s.lrn.toString().includes(searchTerm) ||
+               s.email.toLowerCase().includes(searchTerm);
+    });
+    renderTable();
+    updateStats();
+    updateCharts();
+}
+
+function updateStats() {
+    const total = filteredStudents.length;
+    const male = filteredStudents.filter(s => s.studentInfo.sex === 'male').length;
+    const female = filteredStudents.filter(s => s.studentInfo.sex === 'female').length;
+
+    const today = new Date().toDateString();
+    const today_count = allStudents.filter(s => new Date(s.enrollmentDate).toDateString() === today).length;
+
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('maleCount').textContent = male;
+    document.getElementById('femaleCount').textContent = female;
+    document.getElementById('todayCount').textContent = today_count;
+}
+
+function renderTable() {
+    const container = document.getElementById('tableContainer');
+    document.getElementById('recordsCount').textContent = `Students: ${filteredStudents.length}`;
+
+    if (filteredStudents.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <p>No students found</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>LRN</th>
+                    <th>Full Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Grade</th>
+                    <th>Strand</th>
+                    <th>School Year</th>
+                    <th>School Last Attended</th>
+                    <th>GWA</th>
+                    <th>Father</th>
+                    <th>Father Contact</th>
+                    <th>Mother</th>
+                    <th>Mother Contact</th>
+                    <th>Contact Number</th>
+                    <th>Email</th>
+                    <th>House Address</th>
+                    <th>Province</th>
+                    <th>City</th>
+                    <th>Barangay</th>
+                    <th>Payment Category</th>
+                    <th>ALS Status</th>
+                    <th>Emergency Contact</th>
+                    <th>Emergency Relationship</th>
+                    <th>Emergency Contact No.</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    filteredStudents.forEach((enrollment, index) => {
+        const s = enrollment.studentInfo;
+        const p = enrollment.parentsInfo;
+        const a = enrollment.addressInfo;
+        const e = enrollment.emergencyContact;
+        
+        html += `
+            <tr>
+                <td>${enrollment.id}</td>
+                <td>${s.lrn}</td>
+                <td><strong>${s.firstName} ${s.middleName ? s.middleName + ' ' : ''}${s.lastName}</strong></td>
+                <td>${s.age || 'N/A'}</td>
+                <td title="Click to filter by gender" onclick="filterByGender('${s.sex}'); event.stopPropagation();" style="cursor: pointer; font-weight: 600; color: #00A693; transition: 0.2s;" onmouseover="this.style.background='#e8f5f5'; this.style.borderRadius='4px';" onmouseout="this.style.background='transparent';">${s.sex ? s.sex.charAt(0).toUpperCase() + s.sex.slice(1) : 'N/A'}</td>
+                <td>Grade ${s.gradeLevel}</td>
+                <td><span class="strand-badge ${s.strand}">${s.strand.toUpperCase()}</span></td>
+                <td>${s.schoolYear || 'N/A'}</td>
+                <td>${s.schoolLastAttended || 'N/A'}</td>
+                <td>${s.gwa || 'N/A'}</td>
+                <td>${p.fatherName || 'N/A'}</td>
+                <td>${p.fatherContact || 'N/A'}</td>
+                <td>${p.motherName || 'N/A'}</td>
+                <td>${p.motherContact || 'N/A'}</td>
+                <td>${s.contactNumber || 'N/A'}</td>
+                <td>${s.email || 'N/A'}</td>
+                <td>${s.houseAddress || 'N/A'}</td>
+                <td>${a.province || 'N/A'}</td>
+                <td>${a.city || 'N/A'}</td>
+                <td>${a.barangay || 'N/A'}</td>
+                <td>${s.paymentCategory || 'N/A'}</td>
+                <td>${s.alsPasser === 'yes' ? 'Yes' : 'No'}</td>
+                <td>${e.name || 'N/A'}</td>
+                <td>${e.relationship || 'N/A'}</td>
+                <td>${e.contactNumber || 'N/A'}</td>
+                <td style="display: flex; gap: 5px; white-space: nowrap;">
+                    <button class="action-btn btn-edit" onclick="editStudent(${index})" style="padding: 6px 12px; font-size: 12px; background: #006b63; color: white; border: none; border-radius: 6px; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#00A693'" onmouseout="this.style.background='#006b63'">
+                        Edit
+                    </button>
+                    <button class="action-btn btn-delete" onclick="deleteStudent(${index})" style="padding: 6px 12px; font-size: 12px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; transition: 0.3s;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    container.innerHTML = html;
+}
+
+function updateCharts() {
+    // Strand Chart
+    const strandCounts = {
+        'stem': filteredStudents.filter(s => s.studentInfo.strand === 'stem').length,
+        'humss': filteredStudents.filter(s => s.studentInfo.strand === 'humss').length,
+        'abm': filteredStudents.filter(s => s.studentInfo.strand === 'abm').length,
+        'tvl-ict': filteredStudents.filter(s => s.studentInfo.strand === 'tvl-ict').length,
+        'tvl-he': filteredStudents.filter(s => s.studentInfo.strand === 'tvl-he').length,
+        'gas': filteredStudents.filter(s => s.studentInfo.strand === 'gas').length
+    };
+
+    const ctx1 = document.getElementById('strandChart').getContext('2d');
+    if (chartInstances.strand) chartInstances.strand.destroy();
+    
+    chartInstances.strand = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: ['STEM', 'HUMSS', 'ABM', 'TVL ICT', 'TVL HE', 'GAS'],
+            datasets: [{
+                data: [strandCounts.stem, strandCounts.humss, strandCounts.abm, strandCounts['tvl-ict'], strandCounts['tvl-he'], strandCounts.gas],
+                backgroundColor: ['#3B82F6', '#8B5CF6', '#FFA500', '#10B981', '#06B6D4', '#EC4899'],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 15 } }
+            }
+        }
+    });
+
+    // Gender Chart
+    const maleCount = filteredStudents.filter(s => s.studentInfo.sex === 'male').length;
+    const femaleCount = filteredStudents.filter(s => s.studentInfo.sex === 'female').length;
+
+    const ctx2 = document.getElementById('genderChart').getContext('2d');
+    if (chartInstances.gender) chartInstances.gender.destroy();
+    
+    chartInstances.gender = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                label: 'Number of Students',
+                data: [maleCount, femaleCount],
+                backgroundColor: ['#3B82F6', '#EC4899'],
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+let currentEditingStudentIndex = -1;
+let currentEditingStudentId = null;
+
+function viewStudent(index) {
+    const student = filteredStudents[index];
+    const s = student.studentInfo;
+    
+    let html = `
+        <div class="view-field">
+            <div class="view-label">Full Name</div>
+            <div class="view-value"><strong>${s.firstName} ${s.lastName}</strong></div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">LRN (Learner Reference Number)</div>
+            <div class="view-value">${s.lrn}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Age</div>
+            <div class="view-value">${s.age || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Email</div>
+            <div class="view-value">${s.email}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Contact Number</div>
+            <div class="view-value">${s.contactNumber}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Gender</div>
+            <div class="view-value">${s.sex.charAt(0).toUpperCase() + s.sex.slice(1)}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Grade Level</div>
+            <div class="view-value">Grade ${s.gradeLevel}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Strand</div>
+            <div class="view-value"><span class="strand-badge ${s.strand}">${s.strand.toUpperCase()}</span></div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">School Year</div>
+            <div class="view-value">${s.schoolYear || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">GWA (General Weighted Average)</div>
+            <div class="view-value">${s.gwa}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Payment Category</div>
+            <div class="view-value">${s.paymentCategory || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">ALS / A&E Passer</div>
+            <div class="view-value">${s.alsPasser === 'yes' ? 'Yes' : 'No'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">School Last Attended</div>
+            <div class="view-value">${s.schoolLastAttended || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">House No. / Full Address</div>
+            <div class="view-value">${s.houseAddress || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Address (Province, City, Barangay)</div>
+            <div class="view-value">${student.addressInfo.province || 'N/A'}, ${student.addressInfo.city || 'N/A'}, ${student.addressInfo.barangay || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Parents (Father / Mother)</div>
+            <div class="view-value">${student.parentsInfo.fatherName || 'N/A'} / ${student.parentsInfo.motherName || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Emergency Contact</div>
+            <div class="view-value">${student.emergencyContact.name || 'N/A'} (${student.emergencyContact.relationship || 'N/A'}) - ${student.emergencyContact.contactNumber || 'N/A'}</div>
+        </div>
+        <div class="view-field">
+            <div class="view-label">Enrollment Date</div>
+            <div class="view-value">${new Date(student.enrollmentDate).toLocaleDateString()}</div>
+        </div>
+    `;
+    
+    document.getElementById('viewModalBody').innerHTML = html;
+    document.getElementById('viewModal').classList.add('show');
+}
+
+function closeViewModal() {
+    document.getElementById('viewModal').classList.remove('show');
+}
+
+function editStudent(index) {
+    const student = filteredStudents[index];
+    const s = student.studentInfo;
+    const p = student.parentsInfo;
+    const a = student.addressInfo;
+    const e = student.emergencyContact;
+    
+    currentEditingStudentIndex = index;
+    currentEditingStudentId = student.id;
+    
+    // Student Information
+    document.getElementById('editFirstName').value = s.firstName || '';
+    document.getElementById('editMiddleName').value = s.middleName || '';
+    document.getElementById('editLastName').value = s.lastName || '';
+    document.getElementById('editSuffix').value = s.suffix || '';
+    document.getElementById('editLRN').value = s.lrn || '';
+    document.getElementById('editEmail').value = s.email || '';
+    document.getElementById('editContact').value = s.contactNumber || '';
+    document.getElementById('editAge').value = s.age || '';
+    document.getElementById('editGender').value = s.sex || '';
+    document.getElementById('editDateOfBirth').value = s.dateOfBirth || '';
+    document.getElementById('editSchoolLastAttended').value = s.schoolLastAttended || '';
+    document.getElementById('editGWA').value = s.gwa || '';
+    document.getElementById('editGrade').value = s.gradeLevel || '';
+    document.getElementById('editStrand').value = s.strand || '';
+    document.getElementById('editSchoolYear').value = s.schoolYear || '';
+    
+    // Parents Information
+    document.getElementById('editFatherName').value = p.fatherName || '';
+    document.getElementById('editFatherContact').value = p.fatherContact || '';
+    document.getElementById('editFatherAlumni').value = p.fatherAlumni || 'no';
+    document.getElementById('editMotherName').value = p.motherName || '';
+    document.getElementById('editMotherContact').value = p.motherContact || '';
+    document.getElementById('editMotherAlumni').value = p.motherAlumni || 'no';
+    
+    // Address
+    document.getElementById('editHouseAddress').value = s.houseAddress || '';
+    document.getElementById('editProvince').value = a.province || '';
+    document.getElementById('editCity').value = a.city || '';
+    document.getElementById('editBarangay').value = a.barangay || '';
+    
+    // Payment Category
+    document.getElementById('editPaymentCategory').value = s.paymentCategory || '';
+    document.getElementById('editALS').value = s.alsPasser || 'no';
+    
+    // Emergency Contact
+    document.getElementById('editEmergencyName').value = e.name || '';
+    document.getElementById('editEmergencyRelationship').value = e.relationship || '';
+    document.getElementById('editEmergencyContact').value = e.contactNumber || '';
+    
+    document.getElementById('editModal').classList.add('show');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('show');
+    document.getElementById('editForm').reset();
+    currentEditingStudentIndex = -1;
+    currentEditingStudentId = null;
+}
+
+function saveStudent(event) {
+    event.preventDefault();
+    
+    const updatedStudent = {
+        studentInfo: {
+            firstName: document.getElementById('editFirstName').value,
+            middleName: document.getElementById('editMiddleName').value,
+            lastName: document.getElementById('editLastName').value,
+            suffix: document.getElementById('editSuffix').value,
+            lrn: document.getElementById('editLRN').value,
+            email: document.getElementById('editEmail').value,
+            contactNumber: document.getElementById('editContact').value,
+            age: parseInt(document.getElementById('editAge').value) || 0,
+            sex: document.getElementById('editGender').value,
+            dateOfBirth: document.getElementById('editDateOfBirth').value,
+            gradeLevel: document.getElementById('editGrade').value,
+            strand: document.getElementById('editStrand').value,
+            gwa: document.getElementById('editGWA').value,
+            schoolYear: document.getElementById('editSchoolYear').value,
+            schoolLastAttended: document.getElementById('editSchoolLastAttended').value,
+            houseAddress: document.getElementById('editHouseAddress').value,
+            paymentCategory: document.getElementById('editPaymentCategory').value,
+            alsPasser: document.getElementById('editALS').value
+        },
+        parentsInfo: {
+            fatherName: document.getElementById('editFatherName').value,
+            fatherContact: document.getElementById('editFatherContact').value,
+            fatherAlumni: document.getElementById('editFatherAlumni').value,
+            motherName: document.getElementById('editMotherName').value,
+            motherContact: document.getElementById('editMotherContact').value,
+            motherAlumni: document.getElementById('editMotherAlumni').value
+        },
+        addressInfo: {
+            province: document.getElementById('editProvince').value,
+            city: document.getElementById('editCity').value,
+            barangay: document.getElementById('editBarangay').value
+        },
+        emergencyContact: {
+            name: document.getElementById('editEmergencyName').value,
+            relationship: document.getElementById('editEmergencyRelationship').value,
+            contactNumber: document.getElementById('editEmergencyContact').value
+        }
+    };
+    
+    fetch(`/api/enrollments/${currentEditingStudentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedStudent)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update the local data
+        const studentToUpdate = allStudents.find(s => s.id === currentEditingStudentId);
+        if (studentToUpdate) {
+            studentToUpdate.studentInfo = updatedStudent.studentInfo;
+            studentToUpdate.parentsInfo = updatedStudent.parentsInfo;
+            studentToUpdate.addressInfo = updatedStudent.addressInfo;
+            studentToUpdate.emergencyContact = updatedStudent.emergencyContact;
+        }
+        
+        closeEditModal();
+        applyFilters();
+        alert('Student information updated successfully!');
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        alert('Error updating student information');
+    });
+}
+
+function deleteStudent(index) {
+    const student = filteredStudents[index];
+    const studentName = `${student.studentInfo.firstName} ${student.studentInfo.lastName}`;
+    
+    if (confirm(`Are you sure you want to delete ${studentName}? This action cannot be undone.`)) {
+        const studentId = student.id;
+        
+        fetch(`/api/enrollments/${studentId}`, { 
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            allStudents = allStudents.filter(s => s.id !== studentId);
+            applyFilters();
+            alert(`Student ${studentName} has been deleted successfully!`);
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Error deleting student');
+        });
+    }
+}
+
+function logout() {
+    document.getElementById('logoutModal').classList.add('show');
+}
+
+function confirmLogout() {
+    localStorage.removeItem('adminUser');
+    window.location.href = 'home.html';
+}
+
+function cancelLogout() {
+    document.getElementById('logoutModal').classList.remove('show');
+}
+
+function exportStudentsToCSV() {
+    if (filteredStudents.length === 0) {
+        alert('No students to export');
+        return;
+    }
+
+    let csv = 'ID,Full Name,Age,Gender,Grade,Strand,Father,Mother,Contact Number,Email,Province,City,Barangay,Emergency Contact,GWA\n';
+
+    filteredStudents.forEach((enrollment, index) => {
+        const s = enrollment.studentInfo;
+        const p = enrollment.parentsInfo;
+        const a = enrollment.addressInfo;
+        const e = enrollment.emergencyContact;
+        
+        csv += `"${index + 1}","${s.firstName} ${s.lastName}","${s.age || 'N/A'}","${s.sex}","${s.gradeLevel}","${s.strand}","${p.fatherName || 'N/A'}","${p.motherName || 'N/A'}","${s.contactNumber || 'N/A'}","${s.email || 'N/A'}","${a.province || 'N/A'}","${a.city || 'N/A'}","${a.barangay || 'N/A'}","${e.name || 'N/A'}","${s.gwa || 'N/A'}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `students_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Load on page load
+loadData();
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    const viewModal = document.getElementById('viewModal');
+    const editModal = document.getElementById('editModal');
+    const logoutModal = document.getElementById('logoutModal');
+    
+    if (event.target === viewModal) {
+        viewModal.classList.remove('show');
+    }
+    if (event.target === editModal) {
+        editModal.classList.remove('show');
+    }
+    if (event.target === logoutModal) {
+        logoutModal.classList.remove('show');
+    }
+}
+</script>
+
+</body>
+</html>

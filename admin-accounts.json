@@ -1,0 +1,58 @@
+{
+  "accounts": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "email": "admin@shacses.edu"
+    },
+    {
+      "id": 1769827988312,
+      "username": "surugi64",
+      "password": "Jhared",
+      "email": "redjha669@gmail.com"
+    },
+    {
+      "id": 1769828558665,
+      "username": "Jurion Costales",
+      "password": "bawalbadingd2",
+      "email": "jurionc.@gmail.com"
+    },
+    {
+      "id": 1769832641059,
+      "username": "Shane",
+      "password": "Jhared",
+      "email": "redjha669@gmail.com"
+    },
+    {
+      "id": 1770083237506,
+      "username": "surugi34",
+      "password": "jhared",
+      "email": "redjha669@gmail.com"
+    },
+    {
+      "id": 1771213542972,
+      "username": "surugi22",
+      "password": "jhared",
+      "email": "redjha669@gmail.com"
+    },
+    {
+      "id": 1771224691430,
+      "username": "xean",
+      "password": "xean34",
+      "email": "marygracecabrer67@yahoo.com"
+    },
+    {
+      "id": 1771391891170,
+      "username": "yin",
+      "password": "yinyin",
+      "email": "marygracecabrer67@yahoo.com"
+    },
+    {
+      "id": 1771464698318,
+      "username": "tsuru",
+      "password": "jhared34",
+      "email": "redjha669@gmail.com"
+    }
+  ]
+}

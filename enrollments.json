@@ -1,0 +1,580 @@
+{
+  "enrollments": [
+    {
+      "studentInfo": {
+        "lrn": "400969150391",
+        "firstName": "David Kiann",
+        "middleName": "Salazar",
+        "lastName": "Castro",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2001-12-19",
+        "age": 24,
+        "contactNumber": "09063952462",
+        "email": "davidkiann19@gmail.com",
+        "schoolLastAttended": "Grace of Shekinah School",
+        "gwa": "98",
+        "strand": "humss",
+        "gradeLevel": "11",
+        "schoolYear": "25-26",
+        "houseAddress": "bahay",
+        "paymentCategory": "Public",
+        "alsPasser": "no"
+      },
+      "parentsInfo": {
+        "fatherName": "Dennies Castro",
+        "fatherContact": "09972474971",
+        "fatherAlumni": "yes",
+        "fatherGraduatedYear": "1975",
+        "motherName": "Filomena Castro",
+        "motherContact": "09972474971",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "bocaue",
+        "barangay": "barangay-1"
+      },
+      "emergencyContact": {
+        "name": "suru",
+        "relationship": "idol",
+        "contactNumber": "09123123123"
+      },
+      "id": 1769827570625,
+      "enrollmentDate": "2026-01-31T02:46:10.625Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "152153324335",
+        "firstName": "Mar Guiller",
+        "middleName": "Sican",
+        "lastName": "Guevarra",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2008-04-07",
+        "age": 17,
+        "contactNumber": "09675930785",
+        "email": "gmarguiiler@gmail.com",
+        "schoolLastAttended": "catmon national high school ",
+        "gwa": "90",
+        "strand": "tvl-ict",
+        "gradeLevel": "11"
+      },
+      "parentsInfo": {
+        "fatherName": "mario guevarra",
+        "fatherContact": "09675930785",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "genilyn guevarra",
+        "motherContact": "09675930785",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "bulac"
+      },
+      "emergencyContact": {
+        "name": "genilyn s. guevarra ",
+        "relationship": "parent ",
+        "contactNumber": "09675930785"
+      },
+      "id": 1769828992388,
+      "enrollmentDate": "2026-01-31T03:09:52.388Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "105152110100",
+        "firstName": "Angel Rose",
+        "middleName": "Antonio",
+        "lastName": "Nolasco",
+        "suffix": "",
+        "sex": "female",
+        "dateOfBirth": "2005-10-06",
+        "age": 20,
+        "contactNumber": "09458860528",
+        "email": "nolascoroseangel@gmail.co",
+        "schoolLastAttended": "Catmon National High School",
+        "gwa": "94",
+        "strand": "humss",
+        "gradeLevel": "12"
+      },
+      "parentsInfo": {
+        "fatherName": "Jose Nolasco",
+        "fatherContact": "09061957102",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "N/A",
+        "motherContact": "09061957102",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "catmon"
+      },
+      "emergencyContact": {
+        "name": "Jose Nolasco",
+        "relationship": "Father",
+        "contactNumber": "09061957102"
+      },
+      "id": 1771225316691,
+      "enrollmentDate": "2026-02-16T07:01:56.691Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "102034527",
+        "firstName": "Achilles Troy",
+        "middleName": "Domingo",
+        "lastName": "Adrales",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2008-05-21",
+        "age": 17,
+        "contactNumber": "09362044670",
+        "email": "adrales.achille.lhs@gmail.com",
+        "schoolLastAttended": "Dr. Yangga Colleges Inc.",
+        "gwa": "95",
+        "strand": "humss",
+        "gradeLevel": "12",
+        "schoolYear": "25-26",
+        "houseAddress": "bahay",
+        "paymentCategory": "Non-ECS (Approved Online)",
+        "alsPasser": "no"
+      },
+      "parentsInfo": {
+        "fatherName": "Roland Adrales",
+        "fatherContact": "09362044670",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Maria Joyce Doreen Domingo",
+        "motherContact": "09362044670",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "paombong",
+        "barangay": "barangay-1"
+      },
+      "emergencyContact": {
+        "name": "Ronn Harry Adrales",
+        "relationship": "Uncle",
+        "contactNumber": "09835728198"
+      },
+      "id": 1771226347875,
+      "enrollmentDate": "2026-02-16T07:19:07.875Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "158531140402",
+        "firstName": "DAVE",
+        "middleName": "MALLARI",
+        "lastName": "DESPI",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2009-01-18",
+        "age": 17,
+        "contactNumber": "09536155713",
+        "email": "despidave127@gmail.com",
+        "schoolLastAttended": "Sacred Heart Academy",
+        "gwa": "96",
+        "strand": "abm",
+        "gradeLevel": "12"
+      },
+      "parentsInfo": {
+        "fatherName": "Dandy Despi",
+        "fatherContact": "09536155713",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Michelle Mallari",
+        "motherContact": "09536155713",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "san-vicente"
+      },
+      "emergencyContact": {
+        "name": "Danica Despi",
+        "relationship": "Sister",
+        "contactNumber": "09488501842"
+      },
+      "id": 1771226916716,
+      "enrollmentDate": "2026-02-16T07:28:36.716Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "111111111111",
+        "firstName": "Jehlaica",
+        "middleName": "Domingo",
+        "lastName": "Jose",
+        "suffix": "Senior High School",
+        "sex": "",
+        "dateOfBirth": "2008-10-04",
+        "age": 17,
+        "contactNumber": "09603231373",
+        "email": "yyaael04@gmail.com",
+        "schoolLastAttended": "Grace of Shekinah School",
+        "gwa": "94",
+        "strand": "tvl-he",
+        "gradeLevel": "11"
+      },
+      "parentsInfo": {
+        "fatherName": "Renato Jose Jeh",
+        "fatherContact": "09603231373",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Glaiza Domingo",
+        "motherContact": "09231388627",
+        "motherAlumni": "yes",
+        "motherGraduatedYear": "1980"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "santa-cruz"
+      },
+      "emergencyContact": {
+        "name": "Glaiza Domingo",
+        "relationship": "Mother",
+        "contactNumber": "09603231373"
+      },
+      "id": 1771227680586,
+      "enrollmentDate": "2026-02-16T07:41:20.586Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "879899976444",
+        "firstName": "Jhan Andrei",
+        "middleName": "Villote",
+        "lastName": "San Luis",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2026-02-11",
+        "age": 0,
+        "contactNumber": "09086319494",
+        "email": "sanluis.jhanandrei.11@gmail.com",
+        "schoolLastAttended": "Holy Child Montessori School of  Bulacan Inc,.",
+        "gwa": "94",
+        "strand": "tvl-he",
+        "gradeLevel": "11"
+      },
+      "parentsInfo": {
+        "fatherName": "Michael San Luis",
+        "fatherContact": "09087362434",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Mary Ann San Luis",
+        "motherContact": "09068364858",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "parada"
+      },
+      "emergencyContact": {
+        "name": "Rebecca San Luis",
+        "relationship": "Grandmother",
+        "contactNumber": "09086743365"
+      },
+      "id": 1771228164807,
+      "enrollmentDate": "2026-02-16T07:49:24.807Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "400969151442",
+        "firstName": "Arrold Matthieuw",
+        "middleName": "Alos",
+        "lastName": "Rosales",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2008-02-27",
+        "age": 17,
+        "contactNumber": "09312172412",
+        "email": "rosalesarrold27@gmail.com",
+        "schoolLastAttended": "Sacred Heart Academy",
+        "gwa": "96.5",
+        "strand": "stem",
+        "gradeLevel": "12"
+      },
+      "parentsInfo": {
+        "fatherName": "Richard D. Rosales.",
+        "fatherContact": "09311894145",
+        "fatherAlumni": "yes",
+        "fatherGraduatedYear": "1990",
+        "motherName": "Ma. Victoria Alos Rosales",
+        "motherContact": "09329099881",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "parada"
+      },
+      "emergencyContact": {
+        "name": "Ma. Victoria Alos Rosales",
+        "relationship": "Mother",
+        "contactNumber": "09329099881"
+      },
+      "id": 1771392573513,
+      "enrollmentDate": "2026-02-18T05:29:33.513Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "473287485",
+        "firstName": "Coreen",
+        "middleName": "Phoebe",
+        "lastName": "Ili",
+        "suffix": "",
+        "sex": "female",
+        "dateOfBirth": "2008-12-22",
+        "age": 17,
+        "contactNumber": "09067805396",
+        "email": "rmel1826@gmail.com",
+        "schoolLastAttended": "Schola Christi Inc.",
+        "gwa": "94",
+        "strand": "tvl-ict",
+        "gradeLevel": "11"
+      },
+      "parentsInfo": {
+        "fatherName": "Ili, Rommel T.",
+        "fatherContact": "09163662684",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Laureano, Janice H.",
+        "motherContact": "",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "catmon"
+      },
+      "emergencyContact": {
+        "name": "Ili, Rommel T.",
+        "relationship": "Father",
+        "contactNumber": "09163662648"
+      },
+      "id": 1771393318172,
+      "enrollmentDate": "2026-02-18T05:41:58.172Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "123456789012",
+        "firstName": "Ralfh Son ",
+        "middleName": "Reyes",
+        "lastName": "Caguiat",
+        "suffix": "na",
+        "sex": "male",
+        "dateOfBirth": "2007-01-28",
+        "age": 19,
+        "contactNumber": "09694592384",
+        "email": "ralfhsoncaguiat@gmail.com",
+        "schoolLastAttended": "Sacred Heart Academy",
+        "gwa": "90",
+        "strand": "stem",
+        "gradeLevel": "12"
+      },
+      "parentsInfo": {
+        "fatherName": "Rafael Fernandez Caguiat",
+        "fatherContact": "0906526706",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Sheila Reyes Roxas ",
+        "motherContact": "09977627355",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "san-jose-patag"
+      },
+      "emergencyContact": {
+        "name": "sheila reyes roxas",
+        "relationship": "mother",
+        "contactNumber": "09976273553"
+      },
+      "id": 1771394149998,
+      "enrollmentDate": "2026-02-18T05:55:49.998Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "41870415085",
+        "firstName": "Gian",
+        "middleName": "Cataniag",
+        "lastName": "Glorioso",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2009-09-15",
+        "age": 16,
+        "contactNumber": "09231016194",
+        "email": "gcglorioso15@gmail.com",
+        "schoolLastAttended": "Sacred Heart Academy ",
+        "gwa": "96.75",
+        "strand": "stem",
+        "gradeLevel": "11"
+      },
+      "parentsInfo": {
+        "fatherName": "Gerald John G. Glorioso",
+        "fatherContact": "0995553948",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Arlene F. Cataniag",
+        "motherContact": "09232497261",
+        "motherAlumni": "yes",
+        "motherGraduatedYear": "1994"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "bagbaguin"
+      },
+      "emergencyContact": {
+        "name": "Elijah Luke Percil",
+        "relationship": "Guardian",
+        "contactNumber": "09667805823"
+      },
+      "id": 1771395229823,
+      "enrollmentDate": "2026-02-18T06:13:49.823Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "112334567890",
+        "firstName": "Kristel Anne ",
+        "middleName": "Carandang",
+        "lastName": "Alvarez",
+        "suffix": "N/A",
+        "sex": "",
+        "dateOfBirth": "2008-11-26",
+        "age": 17,
+        "contactNumber": "09332351324",
+        "email": "kristelannea6@gmail.com",
+        "schoolLastAttended": "Parada National High School",
+        "gwa": "97",
+        "strand": "stem",
+        "gradeLevel": "11"
+      },
+      "parentsInfo": {
+        "fatherName": "Nicarter A. Alvarez",
+        "fatherContact": "09332351324",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Asuncion A. Alvarez",
+        "motherContact": "09332351324",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa-maria",
+        "barangay": "parada"
+      },
+      "emergencyContact": {
+        "name": "Shelley C. Alvarez",
+        "relationship": "Sister",
+        "contactNumber": "09332351324"
+      },
+      "id": 1771396401218,
+      "enrollmentDate": "2026-02-18T06:33:21.218Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "123123123123",
+        "firstName": "jhared",
+        "middleName": "gayapa",
+        "lastName": "daguplo",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2008-06-27",
+        "age": 17,
+        "contactNumber": "09123123123",
+        "email": "redjha669@gmail.com",
+        "schoolLastAttended": "SGNHS",
+        "gwa": "99",
+        "schoolYear": "2025-2026",
+        "houseAddress": "yea",
+        "strand": "abm",
+        "gradeLevel": "11",
+        "paymentCategory": "Public",
+        "alsPasser": "no"
+      },
+      "parentsInfo": {
+        "fatherName": "pa",
+        "fatherContact": "09123123123",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "ma",
+        "motherContact": "09123123123",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "aurora",
+        "city": "dilasag",
+        "barangay": "barangay-1"
+      },
+      "emergencyContact": {
+        "name": "pa",
+        "relationship": "pa",
+        "contactNumber": "09123123123"
+      },
+      "id": 1771464674217,
+      "enrollmentDate": "2026-02-19T01:31:14.217Z"
+    },
+    {
+      "studentInfo": {
+        "lrn": "123123123123",
+        "firstName": "123",
+        "middleName": "123",
+        "lastName": "123",
+        "suffix": "123",
+        "sex": "male",
+        "dateOfBirth": "2026-03-05",
+        "age": 13,
+        "contactNumber": "123",
+        "email": "asdwasd@sdwa",
+        "schoolLastAttended": "123",
+        "gwa": "123",
+        "schoolYear": "123",
+        "houseAddress": "123",
+        "strand": "tvl-ict",
+        "gradeLevel": "11",
+        "paymentCategory": "ECS",
+        "alsPasser": "yes"
+      },
+      "parentsInfo": {
+        "fatherName": "",
+        "fatherContact": "",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "",
+        "motherContact": "",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "",
+        "city": "",
+        "barangay": ""
+      },
+      "emergencyContact": {
+        "name": "",
+        "relationship": "",
+        "contactNumber": ""
+      },
+      "id": 1772442115910,
+      "enrollmentDate": "2026-03-02T09:01:55.910Z"
+    }
+  ]
+}

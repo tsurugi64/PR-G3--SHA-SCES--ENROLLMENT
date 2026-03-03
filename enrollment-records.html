@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrollment Records - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            background: linear-gradient(135deg, #e9ffff, #ffffff, #e0faf6);
+            color: #003f39;
+        }
+
+        .header {
+            background-color: #00A693;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-refresh {
+            background: #00A693;
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: #008f80;
+            transform: scale(1.05);
+        }
+
+        .btn-export {
+            background: #006b63;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #004d47;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #00A693;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #003f39;
+        }
+
+        .table-responsive {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #00A693;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 5px;
+            transition: 0.3s;
+        }
+
+        .view-btn {
+            background: #00A693;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #008f80;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #00A693;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: #00A693;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            color: #00A693;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .modal-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #00A693;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #003f39;
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            color: #00A693;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00A693;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="sha_logo.png" style="width: 50px; height: 50px;" alt="SHA Logo">
+        <h1 style="margin: 0;">Enrollment Records</h1>
+    </div>
+    <div>
+        <a href="admin-dashboard.html" style="color: white; text-decoration: none; margin-right: 20px;">← Back to Dashboard</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="controls">
+        <button class="btn btn-refresh" onclick="loadEnrollments()">
+            Refresh
+        </button>
+        <button class="btn btn-export" onclick="exportToCSV()">
+            Export to CSV
+        </button>
+        <button class="btn btn-filter" id="filterNewBtn" onclick="filterByDateRange('new')" style="background: #00A693; color: white;">
+            Newest First
+        </button>
+        <button class="btn btn-filter" id="filterOldBtn" onclick="filterByDateRange('old')" style="background: white; color: #00A693; border: 2px solid #00A693;">
+            Oldest First
+        </button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Total Enrollments</h3>
+            <div class="number" id="totalCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Today</h3>
+            <div class="number" id="todayCount">0</div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <div id="tableContainer"></div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Enrollment Details</h2>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div id="detailContent"></div>
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button class="action-btn delete-btn" onclick="deleteCurrentEnrollment()" style="flex: 1;">
+                Delete Record
+            </button>
+            <button class="action-btn view-btn" onclick="printCurrentEnrollment()" style="flex: 1;">
+                Print
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Enrollment Record</h2>
+            <button class="close-btn" onclick="closeEditModal()">×</button>
+        </div>
+        <form id="editForm" onsubmit="saveEnrollment(event)">
+            <div class="modal-section">
+                <h3>Student Information</h3>
+                <div class="modal-info">
+                    <div class="info-item">
+                        <div class="info-label">First Name</div>
+                        <input type="text" id="editFirstName" class="info-field" required>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Name</div>
+                        <input type="text" id="editLastName" class="info-field" required>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <input type="email" id="editEmail" class="info-field" required>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Contact Number</div>
+                        <input type="tel" id="editContact" class="info-field" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <h3>Academic Information</h3>
+                <div class="modal-info">
+                    <div class="info-item">
+                        <div class="info-label">School Year</div>
+                        <input type="text" id="editSchoolYear" class="info-field" required>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">House No. / Full Address</div>
+                        <input type="text" id="editHouseAddress" class="info-field" placeholder="House No., Street, Subdivision (if any)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <h3>Payment Information</h3>
+                <div class="modal-info">
+                    <div class="info-item">
+                        <div class="info-label">Payment Category</div>
+                        <select id="editPaymentCategory" class="info-field" required>
+                            <option value="">Select Payment Category</option>
+                            <option value="ECS">ECS</option>
+                            <option value="Non-ECS (Approved Online)">Non-ECS (Approved On-line)</option>
+                            <option value="Public">Public</option>
+                            <option value="Payee">Payee</option>
+                            <option value="ALS / A&E Passer">ALS / A&E Passer</option>
+                        </select>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">ALS / A&E Passer</div>
+                        <select id="editALS" class="info-field" required>
+                            <option value="no">No</option>
+                            <option value="yes">Yes, ALS / A&E Passer</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button type="submit" class="action-btn view-btn" style="flex: 1;">
+                    Save Changes
+                </button>
+                <button type="button" class="action-btn delete-btn" onclick="closeEditModal()" style="flex: 1;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.info-field {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #00A693;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.info-field:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0,166,147,0.3);
+    border-color: #008f80;
+}
+</style>
+
+<script>
+let allEnrollments = [];
+let filteredEnrollments = [];
+let currentEnrollmentId = null;
+let currentEditingEnrollmentId = null;
+let dateFilterOrder = 'new'; // 'new' for newest first, 'old' for oldest first
+
+async function loadEnrollments() {
+    try {
+        const container = document.getElementById('tableContainer');
+        container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+        const response = await fetch('/api/enrollments');
+        allEnrollments = await response.json();
+        
+        // Sort by newest first by default
+        allEnrollments.sort((a, b) => new Date(b.enrollmentDate) - new Date(a.enrollmentDate));
+        filteredEnrollments = allEnrollments;
+
+        updateStats();
+        renderTable();
+    } catch (error) {
+        console.error('Error loading enrollments:', error);
+        document.getElementById('tableContainer').innerHTML = `
+            <div class="empty-state">
+                <p>Error loading enrollments. Please check your connection.</p>
+            </div>
+        `;
+    }
+}
+
+function filterByDateRange(order) {
+    dateFilterOrder = order;
+    
+    // Update button styling
+    document.getElementById('filterNewBtn').style.background = order === 'new' ? '#00A693' : 'white';
+    document.getElementById('filterNewBtn').style.color = order === 'new' ? 'white' : '#00A693';
+    document.getElementById('filterNewBtn').style.border = order === 'new' ? 'none' : '2px solid #00A693';
+    
+    document.getElementById('filterOldBtn').style.background = order === 'old' ? '#00A693' : 'white';
+    document.getElementById('filterOldBtn').style.color = order === 'old' ? 'white' : '#00A693';
+    document.getElementById('filterOldBtn').style.border = order === 'old' ? 'none' : '2px solid #00A693';
+    
+    // Sort the enrollments
+    if (order === 'new') {
+        filteredEnrollments.sort((a, b) => new Date(b.enrollmentDate) - new Date(a.enrollmentDate));
+    } else {
+        filteredEnrollments.sort((a, b) => new Date(a.enrollmentDate) - new Date(b.enrollmentDate));
+    }
+    
+    renderTable();
+}
+
+function updateStats() {
+    document.getElementById('totalCount').textContent = allEnrollments.length;
+
+    const today = new Date().toDateString();
+    const todayEnrollments = allEnrollments.filter(e => {
+        const enrollDate = new Date(e.enrollmentDate).toDateString();
+        return enrollDate === today;
+    }).length;
+    document.getElementById('todayCount').textContent = todayEnrollments;
+}
+
+function renderTable() {
+    const container = document.getElementById('tableContainer');
+
+    if (filteredEnrollments.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <p>No enrollments yet</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>LRN</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Enrollment Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    filteredEnrollments.forEach((enrollment, index) => {
+        const s = enrollment.studentInfo;
+        const enrollDate = new Date(enrollment.enrollmentDate).toLocaleDateString();
+        
+        html += `
+            <tr>
+                <td>${enrollment.id}</td>
+                <td>${s.lrn}</td>
+                <td><strong>${s.firstName} ${s.middleName ? s.middleName + ' ' : ''}${s.lastName}</strong></td>
+                <td>${s.email}</td>
+                <td>${enrollDate}</td>
+                <td style="display: flex; gap: 5px; white-space: nowrap;">
+                    <button class="action-btn view-btn" onclick="viewEnrollment(this)" style="padding: 6px 12px; font-size: 12px;">
+                        View
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteEnrollment(this)" style="padding: 6px 12px; font-size: 12px;">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    container.innerHTML = html;
+}
+
+function viewEnrollment(button) {
+    const row = button.closest('tr');
+    const enrollmentId = row.querySelector('td').textContent;
+    const enrollment = allEnrollments.find(e => e.id == enrollmentId);
+    
+    currentEnrollmentId = enrollmentId;
+
+    if (!enrollment) return;
+
+    const s = enrollment.studentInfo;
+    const p = enrollment.parentsInfo;
+    const a = enrollment.addressInfo;
+    const e = enrollment.emergencyContact;
+
+    const detailContent = document.getElementById('detailContent');
+    detailContent.innerHTML = `
+        <div class="modal-section">
+            <h3>Student Information</h3>
+            <div class="modal-info">
+                <div class="info-item">
+                    <div class="info-label">LRN</div>
+                    <div class="info-value">${s.lrn}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">${s.firstName} ${s.middleName || ''} ${s.lastName} ${s.suffix || ''}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Sex</div>
+                    <div class="info-value">${s.sex}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date of Birth</div>
+                    <div class="info-value">${s.dateOfBirth}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Contact Number</div>
+                    <div class="info-value">${s.contactNumber}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value">${s.email}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">School Last Attended</div>
+                    <div class="info-value">${s.schoolLastAttended}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">GWA</div>
+                    <div class="info-value">${s.gwa}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <h3>Parents Information</h3>
+            <div class="modal-info">
+                <div class="info-item">
+                    <div class="info-label">Father's Name</div>
+                    <div class="info-value">${p.fatherName}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Father's Contact</div>
+                    <div class="info-value">${p.fatherContact}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Father Alumni</div>
+                    <div class="info-value">${p.fatherAlumni ? p.fatherAlumni + ' (' + p.fatherGraduatedYear + ')' : 'No'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mother's Name</div>
+                    <div class="info-value">${p.motherName}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mother's Contact</div>
+                    <div class="info-value">${p.motherContact}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mother Alumni</div>
+                    <div class="info-value">${p.motherAlumni ? p.motherAlumni + ' (' + p.motherGraduatedYear + ')' : 'No'}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <h3>Address</h3>
+            <div class="modal-info">
+                <div class="info-item">
+                    <div class="info-label">House No. / Full Address</div>
+                    <div class="info-value">${s.houseAddress || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Province</div>
+                    <div class="info-value">${a.province}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">City</div>
+                    <div class="info-value">${a.city}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Barangay</div>
+                    <div class="info-value">${a.barangay}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <h3>Emergency Contact</h3>
+            <div class="modal-info">
+                <div class="info-item">
+                    <div class="info-label">Name</div>
+                    <div class="info-value">${e.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Relationship</div>
+                    <div class="info-value">${e.relationship}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Contact Number</div>
+                    <div class="info-value">${e.contactNumber}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <h3>Academic Information</h3>
+            <div class="modal-info">
+                <div class="info-item">
+                    <div class="info-label">Grade Level</div>
+                    <div class="info-value">Grade ${s.gradeLevel}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Strand</div>
+                    <div class="info-value">${s.strand.toUpperCase()}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">School Year</div>
+                    <div class="info-value">${s.schoolYear || 'N/A'}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <h3>Payment Information</h3>
+            <div class="modal-info">
+                <div class="info-item">
+                    <div class="info-label">Payment Category</div>
+                    <div class="info-value">${s.paymentCategory || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ALS / A&E Passer</div>
+                    <div class="info-value">${s.alsPasser === 'yes' ? 'Yes' : 'No'}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <div class="info-item">
+                <div class="info-label">Enrollment Date & Time</div>
+                <div class="info-value">${new Date(enrollment.enrollmentDate).toLocaleString()}</div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('detailModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('detailModal').style.display = 'none';
+    currentEnrollmentId = null;
+}
+
+async function deleteCurrentEnrollment() {
+    if (!currentEnrollmentId) return;
+
+    if (confirm('Are you sure you want to delete this enrollment record?')) {
+        try {
+            const response = await fetch(`/api/enrollments/${currentEnrollmentId}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('Enrollment deleted successfully');
+                closeModal();
+                loadEnrollments();
+            } else {
+                alert('Error deleting enrollment');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error deleting enrollment');
+        }
+    }
+}
+
+function confirmDelete(button) {
+    const row = button.closest('tr');
+    const enrollmentId = row.querySelector('td').textContent;
+    if (confirm('Are you sure you want to delete this enrollment record?')) {
+        deleteEnrollment(enrollmentId);
+    }
+}
+
+async function deleteEnrollment(id) {
+    try {
+        const response = await fetch(`/api/enrollments/${id}`, {
+            method: 'DELETE'
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Enrollment deleted successfully');
+            loadEnrollments();
+        } else {
+            alert('Error deleting enrollment');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting enrollment');
+    }
+}
+
+function printCurrentEnrollment() {
+    const enrollment = allEnrollments.find(e => e.id === currentEnrollmentId);
+    if (!enrollment) return;
+
+    const printWindow = window.open('', '', 'height=600,width=800');
+    const s = enrollment.studentInfo;
+    const p = enrollment.parentsInfo;
+    const a = enrollment.addressInfo;
+    const e = enrollment.emergencyContact;
+
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Enrollment Record</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h2 { color: #00A693; border-bottom: 2px solid #00A693; padding-bottom: 10px; }
+                .section { margin-bottom: 20px; }
+                .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px; }
+                .field { margin-bottom: 10px; }
+                .label { font-weight: bold; color: #003f39; }
+                .value { color: #666; }
+            </style>
+        </head>
+        <body>
+            <h1>Enrollment Record</h1>
+            
+            <div class="section">
+                <h2>Student Information</h2>
+                <div class="row">
+                    <div class="field">
+                        <div class="label">LRN:</div>
+                        <div class="value">${s.lrn}</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Full Name:</div>
+                        <div class="value">${s.firstName} ${s.middleName} ${s.lastName} ${s.suffix}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <div class="label">Sex:</div>
+                        <div class="value">${s.sex}</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Date of Birth:</div>
+                        <div class="value">${s.dateOfBirth}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <div class="label">Email:</div>
+                        <div class="value">${s.email}</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Contact Number:</div>
+                        <div class="value">${s.contactNumber}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Parents Information</h2>
+                <div class="row">
+                    <div class="field">
+                        <div class="label">Father:</div>
+                        <div class="value">${p.fatherName}</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Mother:</div>
+                        <div class="value">${p.motherName}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Address</h2>
+                <div class="field">
+                    <div class="label">Province, City, Barangay:</div>
+                    <div class="value">${a.province}, ${a.city}, ${a.barangay}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Emergency Contact</h2>
+                <div class="field">
+                    <div class="label">Name:</div>
+                    <div class="value">${e.name} (${e.relationship})</div>
+                </div>
+                <div class="field">
+                    <div class="label">Contact Number:</div>
+                    <div class="value">${e.contactNumber}</div>
+                </div>
+            </div>
+
+            <p style="color: #999; font-size: 0.9em; margin-top: 30px;">
+                Enrollment Date: ${new Date(enrollment.enrollmentDate).toLocaleString()}
+            </p>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function exportToCSV() {
+    if (allEnrollments.length === 0) {
+        alert('No enrollments to export');
+        return;
+    }
+
+    let csv = 'ID,LRN,First Name,Middle Name,Last Name,Suffix,Sex,DOB,Email,Contact,Father,Mother,Province,City,Barangay,Enrollment Date\n';
+
+    allEnrollments.forEach(e => {
+        const s = e.studentInfo;
+        const p = e.parentsInfo;
+        const a = e.addressInfo;
+        
+        csv += `"${e.id}","${s.lrn}","${s.firstName}","${s.middleName}","${s.lastName}","${s.suffix}","${s.sex}","${s.dateOfBirth}","${s.email}","${s.contactNumber}","${p.fatherName}","${p.motherName}","${a.province}","${a.city}","${a.barangay}","${new Date(e.enrollmentDate).toLocaleString()}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `enrollments_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+}
+
+window.onclick = function(event) {
+    const detailModal = document.getElementById('detailModal');
+    const editModal = document.getElementById('editModal');
+    if (event.target === detailModal) {
+        closeModal();
+    }
+    if (event.target === editModal) {
+        closeEditModal();
+    }
+}
+
+function editEnrollment(id) {
+    const enrollment = allEnrollments.find(e => e.id === id);
+    if (!enrollment) return;
+
+    currentEditingEnrollmentId = id;
+    const s = enrollment.studentInfo;
+
+    document.getElementById('editFirstName').value = s.firstName;
+    document.getElementById('editLastName').value = s.lastName;
+    document.getElementById('editEmail').value = s.email;
+    document.getElementById('editContact').value = s.contactNumber;
+    document.getElementById('editSchoolYear').value = s.schoolYear || '';
+    document.getElementById('editHouseAddress').value = s.houseAddress || '';
+    document.getElementById('editPaymentCategory').value = s.paymentCategory || '';
+    document.getElementById('editALS').value = s.alsPasser || 'no';
+
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    currentEditingEnrollmentId = null;
+    document.getElementById('editForm').reset();
+}
+
+async function saveEnrollment(event) {
+    event.preventDefault();
+
+    if (!currentEditingEnrollmentId) return;
+
+    try {
+        const enrollment = allEnrollments.find(e => e.id === currentEditingEnrollmentId);
+        if (!enrollment) return;
+
+        const updatedEnrollment = {
+            studentInfo: {
+                ...enrollment.studentInfo,
+                firstName: document.getElementById('editFirstName').value,
+                lastName: document.getElementById('editLastName').value,
+                email: document.getElementById('editEmail').value,
+                contactNumber: document.getElementById('editContact').value,
+                schoolYear: document.getElementById('editSchoolYear').value,
+                houseAddress: document.getElementById('editHouseAddress').value,
+                paymentCategory: document.getElementById('editPaymentCategory').value,
+                alsPasser: document.getElementById('editALS').value
+            },
+            parentsInfo: enrollment.parentsInfo,
+            addressInfo: enrollment.addressInfo,
+            emergencyContact: enrollment.emergencyContact
+        };
+
+        const response = await fetch(`/api/enrollments/${currentEditingEnrollmentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedEnrollment)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Enrollment record updated successfully');
+            closeEditModal();
+            loadEnrollments();
+        } else {
+            alert('Error updating enrollment record');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error updating enrollment record');
+    }
+}
+
+// Load enrollments on page load
+loadEnrollments();
+</script>
+
+</body>
+</html>
