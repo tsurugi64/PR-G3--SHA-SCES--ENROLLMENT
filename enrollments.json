@@ -575,6 +575,51 @@
       },
       "id": 1772442115910,
       "enrollmentDate": "2026-03-02T09:01:55.910Z"
+    },
+    {
+      "enrollmentID": "2026-000007",
+      "studentInfo": {
+        "lrn": "123456789012",
+        "firstName": "jhared",
+        "middleName": "",
+        "lastName": "daguplo",
+        "suffix": "",
+        "sex": "male",
+        "dateOfBirth": "2008-01-15",
+        "age": 18,
+        "contactNumber": "09123456789",
+        "email": "jhared@example.com",
+        "schoolLastAttended": "Sacred Heart Academy",
+        "gwa": "95",
+        "strand": "stem",
+        "gradeLevel": "12",
+        "schoolYear": "26-27",
+        "houseAddress": "Test Address",
+        "paymentCategory": "Private",
+        "alsPasser": "no"
+      },
+      "parentsInfo": {
+        "fatherName": "Test Father",
+        "fatherContact": "09123456789",
+        "fatherAlumni": "no",
+        "fatherGraduatedYear": "N/A",
+        "motherName": "Test Mother",
+        "motherContact": "09123456789",
+        "motherAlumni": "no",
+        "motherGraduatedYear": "N/A"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "city": "santa maria",
+        "barangay": "test-barangay"
+      },
+      "emergencyContact": {
+        "name": "Test Emergency",
+        "relationship": "sibling",
+        "contactNumber": "09123456789"
+      },
+      "id": 1772442115911,
+      "enrollmentDate": "2026-03-01T00:00:00.000Z"
     }
   ]
 }
