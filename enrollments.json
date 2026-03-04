@@ -589,6 +589,40 @@
       },
       "id": 1772442115910,
       "enrollmentDate": "2026-03-02T09:01:55.910Z"
+    },
+    {
+      "studentInfo": {
+        "gwa": "95",
+        "sex": "male",
+        "gradeLevel": "11",
+        "firstName": "Test",
+        "lastName": "Student",
+        "contactNumber": "09123456789",
+        "dateOfBirth": "2008-01-15",
+        "lrn": "123456789012",
+        "schoolLastAttended": "Test School",
+        "strand": "stem",
+        "email": "test@example.com"
+      },
+      "addressInfo": {
+        "province": "bulacan",
+        "barangay": "test",
+        "city": "santa maria"
+      },
+      "parentsInfo": {
+        "fatherContact": "09123456789",
+        "fatherName": "Father",
+        "motherName": "Mother",
+        "motherContact": "09123456789"
+      },
+      "emergencyContact": {
+        "contactNumber": "09123456789",
+        "name": "Emergency",
+        "relationship": "friend"
+      },
+      "id": 1772611287420,
+      "enrollmentDate": "2026-03-04T08:01:27.420Z",
+      "enrollmentID": "2026-000015"
     }
   ]
 }

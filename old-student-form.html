@@ -555,6 +555,8 @@
                     placeholder="12-digit number" 
                     maxlength="12" 
                     inputmode="numeric"
+                    pattern="[0-9]{12}"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 12)"
                 />
                 <button type="button" class="show-hide-btn" onclick="toggleLRNVisibility()">Show</button>
             </div>
@@ -661,6 +663,13 @@
 
             if (!lrn) {
                 showMessage(messageBox, 'Please enter your LRN', 'error');
+                return;
+            }
+
+            // Validate exactly 12 digits
+            if (!/^\d{12}$/.test(lrn)) {
+                showMessage(messageBox, 'LRN must be exactly 12 digits', 'error');
+                document.getElementById('lrnInput').focus();
                 return;
             }
 
