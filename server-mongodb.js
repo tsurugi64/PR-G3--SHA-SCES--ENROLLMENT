@@ -77,7 +77,34 @@ mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log('✅ MongoDB connected successfully'))
+.then(async () => {
+    console.log('✅ MongoDB connected successfully');
+    
+    // Drop the problematic 'id' index if it exists
+    try {
+        await Enrollment.collection.dropIndex('id_1');
+        console.log('✅ Dropped problematic id_1 index from Enrollment collection');
+    } catch (err) {
+        if (err.message.includes('index not found')) {
+            console.log('ℹ️ Index id_1 does not exist, skipping drop');
+        } else {
+            console.warn('⚠️ Could not drop id_1 index:', err.message);
+        }
+    }
+    
+    // Clear the id field from all existing enrollments to prevent conflicts
+    try {
+        const result = await Enrollment.updateMany(
+            { id: { $exists: true, $ne: null } },
+            { $unset: { id: 1 } }
+        );
+        if (result.modifiedCount > 0) {
+            console.log(`✅ Cleared id field from ${result.modifiedCount} enrollments`);
+        }
+    } catch (err) {
+        console.warn('⚠️ Could not clear id field:', err.message);
+    }
+})
 .catch(err => {
     console.error('❌ MongoDB connection error:', err);
     // Fallback to allow server to start even if DB is down
