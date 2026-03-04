@@ -40,6 +40,7 @@ body {
     display:flex;
     justify-content:space-between;
     align-items:center;
+    gap:15px;
 }
 
 .logo-button {
@@ -47,16 +48,24 @@ body {
     align-items:center;
     text-decoration:none;
     color:white;
+    min-width:0;
+    flex:1;
 }
 
 .logo img {
     width:60px;
     margin-right:12px;
+    flex-shrink:0;
 }
 
 .school-name {
     font-size:1.2em;
     font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    flex-shrink:1;
+    min-width:0;
 }
 
 .dark-btn {
