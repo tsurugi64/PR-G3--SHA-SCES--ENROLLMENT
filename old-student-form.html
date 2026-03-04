@@ -622,6 +622,7 @@
             }
 
             try {
+                console.log('Searching for enrollment ID:', enrollmentID);
                 const response = await fetch(`/api/old-student/verify-id`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -629,8 +630,15 @@
                 });
 
                 const result = await response.json();
+                console.log('Search result:', result);
 
                 if (result.success) {
+                    // Check if student is Grade 12 (not eligible for old student re-enrollment)
+                    if (result.enrollmentData && result.enrollmentData.studentInfo && result.enrollmentData.studentInfo.gradeLevel === '12') {
+                        showMessage(messageBox, '⚠️ Your previous enrollment was for Grade 12 (Senior High). Unfortunately, we only have re-enrollment for Grade 11 students. Your next step is college enrollment. Please contact admissions for further assistance.', 'error');
+                        return;
+                    }
+
                     currentEnrollmentData = result;
                     showMessage(messageBox, 'Enrollment ID found!', 'success');
                     
@@ -673,20 +681,50 @@
                 return;
             }
 
+            if (!currentEnrollmentData || !currentEnrollmentData.enrollmentID) {
+                showMessage(messageBox, 'Error: Enrollment data not found. Please go back and search again.', 'error');
+                return;
+            }
+
             try {
+                console.log('Verifying LRN:', lrn);
+                console.log('Enrollment ID:', currentEnrollmentData.enrollmentID);
+                console.log('Database LRN:', currentEnrollmentData.enrollmentData?.studentInfo?.lrn);
+
+                // Direct comparison first (before API call for debugging)
+                const storedLRN = currentEnrollmentData.enrollmentData?.studentInfo?.lrn;
+                if (storedLRN && storedLRN === lrn) {
+                    console.log('✅ LRN matches directly!');
+                    showMessage(messageBox, '✅ LRN verified! Redirecting...', 'success');
+                    
+                    setTimeout(() => {
+                        // Store old student data in session
+                        sessionStorage.setItem('oldStudentData', JSON.stringify(currentEnrollmentData.enrollmentData));
+                        sessionStorage.setItem('enrollmentID', currentEnrollmentData.enrollmentID);
+                        sessionStorage.setItem('studentType', 'old');
+                        sessionStorage.setItem('gradeLevel', currentEnrollmentData.enrollmentData.studentInfo.gradeLevel);
+                        
+                        // Redirect to old student final form
+                        window.location.href = 'old-student-final.html';
+                    }, 1500);
+                    return;
+                }
+
+                // If direct match failed, try API verification
                 const response = await fetch(`/api/old-student/verify-lrn`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         enrollmentID: currentEnrollmentData.enrollmentID, 
-                        lrn 
+                        lrn: lrn
                     })
                 });
 
                 const result = await response.json();
+                console.log('API verification result:', result);
 
                 if (result.success) {
-                    showMessage(messageBox, 'LRN verified! Redirecting...', 'success');
+                    showMessage(messageBox, '✅ LRN verified! Redirecting...', 'success');
                     
                     setTimeout(() => {
                         // Store old student data in session
@@ -695,14 +733,17 @@
                         sessionStorage.setItem('studentType', 'old');
                         sessionStorage.setItem('gradeLevel', result.enrollmentData.studentInfo.gradeLevel);
                         
-                        // Redirect to final enrollment form
-                        window.location.href = 'final-update.html';
+                        // Redirect to old student final form
+                        window.location.href = 'old-student-final.html';
                     }, 1500);
                 } else {
-                    showMessage(messageBox, result.message, 'error');
+                    console.error('LRN verification failed:', result.message);
+                    showMessage(messageBox, '❌ ' + (result.message || 'LRN does not match our records. Please try again.'), 'error');
+                    document.getElementById('lrnInput').value = '';
+                    document.getElementById('lrnInput').focus();
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error verifying LRN:', error);
                 showMessage(messageBox, 'Error verifying LRN. Please try again.', 'error');
             }
         }
