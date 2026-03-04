@@ -564,9 +564,9 @@ function renderTable() {
         
         html += `
             <tr>
-                <td>${enrollment.id}</td>
+                <td>${enrollment.enrollmentID}</td>
                 <td>${s.lrn}</td>
-                <td><strong>${s.firstName} ${s.middleName ? s.middleName + ' ' : ''}${s.lastName}</strong></td>
+                <td><strong>${s.lastName}, ${s.firstName}${s.middleName ? ' ' + s.middleName : ''}</strong></td>
                 <td>${s.email}</td>
                 <td>${enrollDate}</td>
                 <td style="display: flex; gap: 5px; white-space: nowrap;">
@@ -614,7 +614,7 @@ function viewEnrollment(button) {
                 </div>
                 <div class="info-item">
                     <div class="info-label">Full Name</div>
-                    <div class="info-value">${s.firstName} ${s.middleName || ''} ${s.lastName} ${s.suffix || ''}</div>
+                    <div class="info-value">${s.lastName}, ${s.firstName}${s.middleName ? ' ' + s.middleName : ''}${s.suffix ? ' ' + s.suffix : ''}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Sex</div>
@@ -848,7 +848,7 @@ function printCurrentEnrollment() {
                     </div>
                     <div class="field">
                         <div class="label">Full Name:</div>
-                        <div class="value">${s.firstName} ${s.middleName} ${s.lastName} ${s.suffix}</div>
+                        <div class="value">${s.lastName}, ${s.firstName}${s.middleName ? ' ' + s.middleName : ''}${s.suffix ? ' ' + s.suffix : ''}</div>
                     </div>
                 </div>
                 <div class="row">
@@ -923,14 +923,15 @@ function exportToCSV() {
         return;
     }
 
-    let csv = 'ID,LRN,First Name,Middle Name,Last Name,Suffix,Sex,DOB,Email,Contact,Father,Mother,Province,City,Barangay,Enrollment Date\n';
+    let csv = 'ID,LRN,Full Name,Sex,DOB,Email,Contact,Father,Mother,Province,City,Barangay,Enrollment Date\n';
 
     allEnrollments.forEach(e => {
         const s = e.studentInfo;
         const p = e.parentsInfo;
         const a = e.addressInfo;
+        const fullName = `${s.lastName}, ${s.firstName}${s.middleName ? ' ' + s.middleName : ''}${s.suffix ? ' ' + s.suffix : ''}`;
         
-        csv += `"${e.id}","${s.lrn}","${s.firstName}","${s.middleName}","${s.lastName}","${s.suffix}","${s.sex}","${s.dateOfBirth}","${s.email}","${s.contactNumber}","${p.fatherName}","${p.motherName}","${a.province}","${a.city}","${a.barangay}","${new Date(e.enrollmentDate).toLocaleString()}"\n`;
+        csv += `"${e.enrollmentID}","${s.lrn}","${fullName}","${s.sex}","${s.dateOfBirth}","${s.email}","${s.contactNumber}","${p.fatherName}","${p.motherName}","${a.province}","${a.city}","${a.barangay}","${new Date(e.enrollmentDate).toLocaleString()}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
