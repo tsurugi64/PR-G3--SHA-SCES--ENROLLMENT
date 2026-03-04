@@ -959,6 +959,11 @@ function limitInputLength(input, maxLength) {
 function limitPhoneInput(input) {
     input.value = input.value.replace(/[^0-9]/g, '').slice(0, 11);
 }
+
+function limitLRN(input) {
+    input.value = input.value.replace(/[^0-9]/g, '').slice(0, 12);
+}
+
 function toggleFatherYear(show){ document.getElementById('fatherYear').style.display = show ? 'block':'none'; }
 function toggleMotherYear(show){ document.getElementById('motherYear').style.display = show ? 'block':'none'; }
 function toggleDarkMode(){ 
@@ -1240,6 +1245,13 @@ function showCelebration(enrollmentId, gradeLevel, studentType) {
     const modal = document.getElementById('celebrationModal');
     const idDisplay = document.getElementById('enrollmentIdDisplay');
     const detailsDisplay = document.getElementById('enrollmentDetails');
+    
+    // Safety check
+    if (!modal || !idDisplay || !detailsDisplay) {
+        console.error('Celebration modal elements not found');
+        alert('✅ Enrollment successful! Your ID: ' + enrollmentId);
+        return;
+    }
     
     // Set enrollment info
     idDisplay.innerHTML = `<strong>Enrollment ID:</strong><br>${enrollmentId}`;
