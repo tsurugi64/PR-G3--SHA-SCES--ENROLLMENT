@@ -42,6 +42,9 @@ app.use((req, res, next) => {
 app.use(express.static(__dirname));
 
 // MongoDB Schemas
+// Import Enrollment Model
+const Enrollment = require('./models/Enrollment.js');
+
 const AdminAccountSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
     username: { type: String, unique: true, required: true },
@@ -270,13 +273,32 @@ app.delete('/api/enrollments/:id', (req, res) => {
 // ===== OLD STUDENT VERIFICATION ENDPOINTS =====
 
 // Verify enrollment ID exists and get student name
-app.post('/api/old-student/verify-id', (req, res) => {
+app.post('/api/old-student/verify-id', async (req, res) => {
     try {
         const { enrollmentID } = req.body;
         if (!enrollmentID) {
             return res.status(400).json({ success: false, message: 'Enrollment ID is required' });
         }
 
+        // Try MongoDB first
+        if (mongoose.connection.readyState === 1) {
+            const enrollment = await Enrollment.findOne({ 
+                enrollmentID: enrollmentID 
+            });
+
+            if (enrollment && enrollment.studentInfo) {
+                const studentName = `${enrollment.studentInfo.firstName} ${enrollment.studentInfo.lastName}`;
+                return res.json({
+                    success: true,
+                    studentName: studentName,
+                    enrollmentID: enrollmentID,
+                    enrollmentData: enrollment,
+                    source: 'mongodb'
+                });
+            }
+        }
+        
+        // Fallback to JSON file
         const db = readEnrollments();
         const enrollment = db.enrollments.find(e => e.enrollmentID === enrollmentID);
 
@@ -285,7 +307,9 @@ app.post('/api/old-student/verify-id', (req, res) => {
             res.json({
                 success: true,
                 studentName: studentName,
-                enrollmentID: enrollmentID
+                enrollmentID: enrollmentID,
+                enrollmentData: enrollment,
+                source: 'json'
             });
         } else {
             res.status(404).json({
@@ -303,33 +327,49 @@ app.post('/api/old-student/verify-id', (req, res) => {
 });
 
 // Verify LRN matches the enrollment
-app.post('/api/old-student/verify-lrn', (req, res) => {
+app.post('/api/old-student/verify-lrn', async (req, res) => {
     try {
         const { enrollmentID, lrn } = req.body;
         if (!enrollmentID || !lrn) {
             return res.status(400).json({ success: false, message: 'Enrollment ID and LRN are required' });
         }
 
-        const db = readEnrollments();
-        const enrollment = db.enrollments.find(e => e.enrollmentID === enrollmentID);
+        // Try MongoDB first
+        if (mongoose.connection.readyState === 1) {
+            const enrollment = await Enrollment.findOne({ 
+                enrollmentID: enrollmentID,
+                'studentInfo.lrn': lrn
+            });
 
-        if (enrollment && enrollment.studentInfo) {
-            if (enrollment.studentInfo.lrn === lrn) {
-                res.json({
+            if (enrollment && enrollment.studentInfo) {
+                return res.json({
                     success: true,
                     message: 'LRN verified successfully',
-                    enrollmentData: enrollment
-                });
-            } else {
-                res.status(401).json({
-                    success: false,
-                    message: 'LRN does not match'
+                    enrollmentData: enrollment,
+                    source: 'mongodb'
                 });
             }
+        }
+        
+        // Fallback to JSON file
+        const db = readEnrollments();
+        const enrollment = db.enrollments.find(e => 
+            e.enrollmentID === enrollmentID && 
+            e.studentInfo && 
+            e.studentInfo.lrn === lrn
+        );
+
+        if (enrollment && enrollment.studentInfo) {
+            res.json({
+                success: true,
+                message: 'LRN verified successfully',
+                enrollmentData: enrollment,
+                source: 'json'
+            });
         } else {
-            res.status(404).json({
+            res.status(401).json({
                 success: false,
-                message: 'Enrollment not found'
+                message: 'LRN does not match or enrollment ID not found'
             });
         }
     } catch (error) {
