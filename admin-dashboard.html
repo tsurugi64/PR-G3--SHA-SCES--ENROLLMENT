@@ -1071,7 +1071,7 @@
 
 <script>
 // Check authentication on page load
-function checkAuth() {
+async function checkAuth() {
     const adminUser = localStorage.getItem('adminUser');
     if (!adminUser) {
         // Redirect to login if not authenticated
@@ -1079,10 +1079,28 @@ function checkAuth() {
         return;
     }
     
-    // Optional: Display admin username if desired
     try {
         const admin = JSON.parse(adminUser);
         console.log('Logged in as:', admin.username);
+        
+        // SECURITY: Verify session with backend
+        const response = await fetch('/api/admin/verify-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: admin.username })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            console.warn('🚨 Session verification failed:', data.message);
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('userType');
+            window.location.href = 'admin-login.html';
+            return;
+        }
+        
+        console.log('✅ Session verified with backend');
     } catch (e) {
         console.error('Error parsing admin user data:', e);
     }

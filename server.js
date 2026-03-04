@@ -1061,6 +1061,47 @@ app.post('/api/admin/login', async (req, res) => {
     }
 });
 
+// Verify admin session (backend validation for dashboard)
+app.post('/api/admin/verify-session', async (req, res) => {
+    try {
+        const { username } = req.body;
+        
+        if (!username) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Username is required' 
+            });
+        }
+        
+        // Verify account exists in database
+        const account = await AdminAccount.findOne({ username });
+        
+        if (!account) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Admin account not found'
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Session is valid',
+            admin: { 
+                id: account._id, 
+                username: account.username, 
+                email: account.email,
+                verified: account.verified
+            }
+        });
+    } catch (error) {
+        console.error('Error verifying session:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error: ' + error.message 
+        });
+    }
+});
+
 // Routing for different views
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Beta-test-final and home updated file', 'student-home.html'));
