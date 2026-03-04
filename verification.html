@@ -1157,12 +1157,23 @@ function validateForm(){
     
     // If old student is selected, show enrollment ID modal instead
     if (studentTypeSelected.value === 'old') {
+        // Hide all new student sections
+        document.getElementById('strandSection').style.display = 'none';
+        document.getElementById('oldStudentSearch').style.display = 'none';
+        document.getElementById('gradeRequirementsSection').style.display = 'none';
+        
+        // Show enrollment ID modal
         document.getElementById('enrollmentIDModal').style.display = 'flex';
         document.getElementById('enrollmentIDErrorMsg').classList.remove('show');
         document.getElementById('enrollmentIDSuccessMsg').classList.remove('show');
         document.getElementById('enrollmentIDInput').value = '';
         return;
     } else {
+        // If new student, hide old student modal and show new student sections
+        document.getElementById('enrollmentIDModal').style.display = 'none';
+        document.getElementById('oldStudentSearch').style.display = 'none';
+        document.getElementById('strandSection').style.display = 'block';
+        
         // If new student, verify strand is selected
         const strandSelected = document.querySelector('input[name="strand"]:checked');
         if (!strandSelected) {
