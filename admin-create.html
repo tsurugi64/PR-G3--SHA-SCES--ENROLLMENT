@@ -283,12 +283,12 @@
 
             <form id="emailForm">
                 <div class="form-group">
-                    <label for="email">School Email Address</label>
+                    <label for="email">Email Address</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email" 
-                        placeholder="teacher@shacademysta.edu"
+                        placeholder="your_email@gmail.com"
                         required
                     >
                 </div>
@@ -391,6 +391,8 @@
         let resendCooldown = 0;
         let codeTimerInterval = null;
         let codeExpireTime = null;
+        let verificationAttempts = 0;
+        const MAX_VERIFICATION_ATTEMPTS = 3;
 
         // Show message
         function showMessage(message, type = 'info') {
@@ -461,7 +463,7 @@
             }
             
             btn.disabled = true;
-            btn.textContent = '⏳ Creating account...';
+            btn.textContent = '⏳ Verifying...';
             
             try {
                 const response = await fetch('/api/admin/verify-code', {
@@ -478,6 +480,7 @@
                 const data = await response.json();
                 
                 if (data.success) {
+                    verificationAttempts = 0;
                     showMessage('✅ Account created successfully! Redirecting to login...', 'success');
                     
                     // Clear form
@@ -489,7 +492,21 @@
                         window.location.href = 'admin-login.html';
                     }, 2000);
                 } else {
-                    showMessage(data.message, 'error');
+                    verificationAttempts++;
+                    const remainingAttempts = MAX_VERIFICATION_ATTEMPTS - verificationAttempts;
+                    
+                    if (remainingAttempts > 0) {
+                        showMessage(`❌ ${data.message} | Attempts remaining: ${remainingAttempts}/${MAX_VERIFICATION_ATTEMPTS}`, 'error');
+                        document.getElementById('code').value = '';
+                        document.getElementById('code').focus();
+                    } else {
+                        // 3 strikes - reset everything
+                        showMessage('❌ Maximum verification attempts exceeded. Resetting system...', 'error');
+                        setTimeout(() => {
+                            verificationAttempts = 0;
+                            window.location.reload();
+                        }, 2000);
+                    }
                 }
             } catch (error) {
                 showMessage('Error: ' + error.message, 'error');

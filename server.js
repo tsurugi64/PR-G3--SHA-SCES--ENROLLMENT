@@ -63,10 +63,28 @@ const VerificationCodeSchema = new mongoose.Schema({
 const AdminAccount = mongoose.model('AdminAccount', AdminAccountSchema);
 const VerificationCode = mongoose.model('VerificationCode', VerificationCodeSchema);
 
-// Approved Teachers List
-const APPROVED_TEACHERS = [
-    'surugi64@gmail.com'
-];
+// Approved Teachers List - Load from file
+let APPROVED_TEACHERS = [];
+function loadApprovedTeachers() {
+    try {
+        const filePath = path.join(__dirname, 'admin-authorized.json');
+        if (fs.existsSync(filePath)) {
+            const data = fs.readFileSync(filePath, 'utf8');
+            const parsed = JSON.parse(data);
+            APPROVED_TEACHERS = parsed.authorizedEmails || [];
+            console.log(`✅ Loaded ${APPROVED_TEACHERS.length} authorized teacher emails`);
+        } else {
+            console.warn('❌ admin-authorized.json not found, using defaults');
+            APPROVED_TEACHERS = ['surugi64@gmail.com'];
+        }
+    } catch (error) {
+        console.error('Error loading authorized teachers:', error);
+        APPROVED_TEACHERS = ['surugi64@gmail.com'];
+    }
+}
+
+// Load on startup
+loadApprovedTeachers();
 
 // Helper function to generate 6-digit code
 function generateVerificationCode() {
@@ -688,27 +706,34 @@ app.post('/api/admin/request-code', async (req, res) => {
         }
         
         // Check if email is approved
-        if (!APPROVED_TEACHERS.includes(email)) {
+        const isApproved = APPROVED_TEACHERS.some(approvedEmail => 
+            approvedEmail.toLowerCase() === email.toLowerCase()
+        );
+        
+        if (!isApproved) {
+            console.log(`❌ Unauthorized email attempted: ${email}`);
             return res.status(403).json({ 
                 success: false, 
-                message: 'This email is not authorized to create an account' 
+                message: 'This email is not authorized to create an account. Please contact your administrator if you believe this is an error.' 
             });
         }
         
         // Check if account already exists
-        const existingAccount = await AdminAccount.findOne({ email });
+        const existingAccount = await AdminAccount.findOne({ email: { $regex: email, $options: 'i' } });
         if (existingAccount) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'An account with this email already exists' 
+                message: 'An account with this email already exists. Please login or use a different email.' 
             });
         }
         
         // Generate and save verification code
         const code = generateVerificationCode();
+        console.log(`📧 Generated verification code for ${email}: ${code}`);
+        
         await VerificationCode.updateOne(
             { email },
-            { email, code, expiresAt: new Date(+new Date() + 15*60000) },
+            { email, code, expiresAt: new Date(+new Date() + 15*60000), attempts: 0 },
             { upsert: true }
         );
         
@@ -716,36 +741,41 @@ app.post('/api/admin/request-code', async (req, res) => {
         try {
             await sgMail.send({
                 to: email,
-                from: 'surugi64@gmail.com',
+                from: 'no-reply@shacademyenrollment.edu',
                 subject: 'SHA Enrollment System - Verification Code',
                 html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <div style="background: #00A693; color: white; padding: 20px; border-radius: 5px; text-align: center;">
-                            <h2>Sacred Heart Academy</h2>
-                            <p>Enrollment System</p>
+                    <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background: linear-gradient(135deg, #00A693, #008f80); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+                            <h2 style="margin: 0; font-size: 28px;">Sacred Heart Academy</h2>
+                            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Enrollment System</p>
                         </div>
-                        <div style="padding: 20px; background: #f9f9f9;">
-                            <h3>Verification Code</h3>
-                            <p>Your verification code is:</p>
-                            <div style="background: white; padding: 20px; border: 2px dashed #00A693; border-radius: 5px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 5px; color: #003F39;">
-                                ${code}
+                        <div style="padding: 30px; background: #f9f9f9; border-bottom: 1px solid #eee;">
+                            <h3 style="color: #003F39; margin-top: 0;">Your Verification Code</h3>
+                            <p style="color: #666; font-size: 16px;">Please use the code below to verify your email and create your admin account:</p>
+                            <div style="background: white; padding: 25px; border: 3px dashed #00A693; border-radius: 8px; text-align: center; margin: 20px 0;">
+                                <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #003F39; font-family: monospace;">${code}</div>
                             </div>
-                            <p>This code will expire in 15 minutes.</p>
-                            <p style="color: #666; font-size: 12px;">If you did not request this code, please ignore this email.</p>
+                            <p style="color: #ff9800; font-size: 14px; font-weight: 600;">⏰ This code expires in 15 minutes</p>
+                            <p style="color: #666; font-size: 13px; margin-bottom: 0;">If you did not request this code, please ignore this email. Do not share this code with anyone.</p>
+                        </div>
+                        <div style="padding: 20px; background: #f0f0f0; text-align: center; border-radius: 0 0 10px 10px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">Sacred Heart Academy Enrollment System</p>
                         </div>
                     </div>
                 `
             });
             
+            console.log(`✅ Verification code sent to ${email}`);
+            
             res.json({ 
                 success: true, 
-                message: 'Verification code sent to your email' 
+                message: 'Verification code sent to your email. Check your inbox.' 
             });
         } catch (emailError) {
             console.error('SendGrid Error:', emailError);
             res.status(500).json({ 
                 success: false, 
-                message: 'Failed to send verification code. Please check email configuration.' 
+                message: 'Failed to send verification code. Please try again or contact support.' 
             });
         }
     } catch (error) {
@@ -769,30 +799,53 @@ app.post('/api/admin/verify-code', async (req, res) => {
             });
         }
         
-        // Check if code is valid
-        const verificationRecord = await VerificationCode.findOne({ email, code });
+        // Check if code exists and is valid
+        const verificationRecord = await VerificationCode.findOne({ email });
         
         if (!verificationRecord) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Invalid verification code' 
+                message: 'No verification code found for this email' 
             });
         }
         
-        // Check if code expired
+        // Check if code is expired
         if (new Date() > verificationRecord.expiresAt) {
+            await VerificationCode.deleteOne({ email });
             return res.status(400).json({ 
                 success: false, 
                 message: 'Verification code has expired' 
             });
         }
         
-        // Check if username is available
+        // Check if code matches
+        if (verificationRecord.code !== code) {
+            // Increment attempts
+            verificationRecord.attempts = (verificationRecord.attempts || 0) + 1;
+            await verificationRecord.save();
+            
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid verification code',
+                attempts: verificationRecord.attempts
+            });
+        }
+        
+        // Code is correct, check if username is available
         const existingUsername = await AdminAccount.findOne({ username });
         if (existingUsername) {
             return res.status(400).json({ 
                 success: false, 
                 message: 'Username already taken' 
+            });
+        }
+        
+        // Check if email already has an account
+        const existingEmail = await AdminAccount.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'An account with this email already exists' 
             });
         }
         
@@ -807,7 +860,9 @@ app.post('/api/admin/verify-code', async (req, res) => {
         await newAccount.save();
         
         // Delete used verification code
-        await VerificationCode.deleteOne({ email, code });
+        await VerificationCode.deleteOne({ email });
+        
+        console.log(`✅ New admin account created: ${username} (${email})`);
         
         res.json({ 
             success: true, 

@@ -166,7 +166,11 @@
     
     <div id="message" class="message"></div>
     
-    <form id="loginForm" onsubmit="handleLogin(event)">
+    <div class=\"info-box\">
+      ℹ️ Enter the username and password you created during account setup
+    </div>
+    
+    <form id=\"loginForm\" onsubmit=\"handleLogin(event)\">
       <div class="form-group">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" placeholder="Enter username" required>
