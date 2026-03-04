@@ -238,47 +238,38 @@ app.post('/api/enroll', async (req, res) => {
             });
         }
 
-        // Check if student with this LRN already exists (for new students only)
-        if (enrollmentData.isNewStudent !== false) {
-            const existingEnrollment = await Enrollment.findOne({
-                'studentInfo.lrn': enrollmentData.studentInfo.lrn
-            });
+        // Check if student with this LRN already exists
+        let existingEnrollment = await Enrollment.findOne({
+            'studentInfo.lrn': enrollmentData.studentInfo.lrn
+        });
 
-            if (existingEnrollment) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Student with LRN ${enrollmentData.studentInfo.lrn} is already enrolled`
-                });
-            }
-        }
-        
-        // Generate formatted enrollment ID (YYYY-XXXXX) - but not for old students
         let enrollmentID;
-        if (enrollmentData.enrollmentID) {
-            // Old student - keep their existing ID
-            enrollmentID = enrollmentData.enrollmentID;
-        } else {
-            // New student - generate new ID
-            enrollmentID = await generateEnrollmentID(enrollmentData.studentInfo.gradeLevel);
+        
+        if (existingEnrollment) {
+            // Student already enrolled - reuse their existing ID (re-enrollment)
+            enrollmentID = existingEnrollment.enrollmentID;
             enrollmentData.enrollmentID = enrollmentID;
-        }
-        
-        enrollmentData.enrollmentDate = new Date();
-        
-        // Handle old student update
-        if (enrollmentData.enrollmentID && enrollmentData.isNewStudent === false) {
-            // Update existing enrollment
+            
+            // Update their existing record
+            enrollmentData.enrollmentDate = new Date();
             await Enrollment.updateOne(
-                { enrollmentID: enrollmentData.enrollmentID },
+                { enrollmentID: enrollmentID },
                 enrollmentData
             );
+            
+            console.log(`✅ Re-enrollment updated: EnrollmentID=${enrollmentID}, LRN=${enrollmentData.studentInfo.lrn}`);
         } else {
+            // New student - generate new sequential ID
+            enrollmentID = await generateEnrollmentID(enrollmentData.studentInfo.gradeLevel);
+            enrollmentData.enrollmentID = enrollmentID;
+            enrollmentData.enrollmentDate = new Date();
+            
             // Create new enrollment
             const enrollment = new Enrollment(enrollmentData);
             await enrollment.save();
+            
+            console.log(`✅ New enrollment created: EnrollmentID=${enrollmentID}, LRN=${enrollmentData.studentInfo.lrn}`);
         }
-        
-        console.log(`✅ New enrollment saved: EnrollmentID=${enrollmentID}, LRN=${enrollmentData.studentInfo.lrn}`);
         
         res.json({ 
             success: true, 
