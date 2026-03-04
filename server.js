@@ -257,6 +257,107 @@ app.delete('/api/enrollments/:id', (req, res) => {
     }
 });
 
+// ===== OLD STUDENT VERIFICATION ENDPOINTS =====
+
+// Verify enrollment ID exists and get student name
+app.post('/api/old-student/verify-id', (req, res) => {
+    try {
+        const { enrollmentID } = req.body;
+        if (!enrollmentID) {
+            return res.status(400).json({ success: false, message: 'Enrollment ID is required' });
+        }
+
+        const db = readEnrollments();
+        const enrollment = db.enrollments.find(e => e.enrollmentID === enrollmentID);
+
+        if (enrollment && enrollment.studentInfo) {
+            const studentName = `${enrollment.studentInfo.firstName} ${enrollment.studentInfo.lastName}`;
+            res.json({
+                success: true,
+                studentName: studentName,
+                enrollmentID: enrollmentID
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'Enrollment ID not found'
+            });
+        }
+    } catch (error) {
+        console.error('Error verifying enrollment ID:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error verifying enrollment ID'
+        });
+    }
+});
+
+// Verify LRN matches the enrollment
+app.post('/api/old-student/verify-lrn', (req, res) => {
+    try {
+        const { enrollmentID, lrn } = req.body;
+        if (!enrollmentID || !lrn) {
+            return res.status(400).json({ success: false, message: 'Enrollment ID and LRN are required' });
+        }
+
+        const db = readEnrollments();
+        const enrollment = db.enrollments.find(e => e.enrollmentID === enrollmentID);
+
+        if (enrollment && enrollment.studentInfo) {
+            if (enrollment.studentInfo.lrn === lrn) {
+                res.json({
+                    success: true,
+                    message: 'LRN verified successfully',
+                    enrollmentData: enrollment
+                });
+            } else {
+                res.status(401).json({
+                    success: false,
+                    message: 'LRN does not match'
+                });
+            }
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'Enrollment not found'
+            });
+        }
+    } catch (error) {
+        console.error('Error verifying LRN:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error verifying LRN'
+        });
+    }
+});
+
+// Get enrollment data by enrollmentID
+app.get('/api/old-student/:enrollmentID', (req, res) => {
+    try {
+        const { enrollmentID } = req.params;
+        const db = readEnrollments();
+        const enrollment = db.enrollments.find(e => e.enrollmentID === enrollmentID);
+
+        if (enrollment) {
+            res.json({
+                success: true,
+                enrollmentData: enrollment
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'Enrollment not found'
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching enrollment:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching enrollment'
+        });
+    }
+});
+
 // Get analytics data
 app.get('/api/analytics', (req, res) => {
     try {
