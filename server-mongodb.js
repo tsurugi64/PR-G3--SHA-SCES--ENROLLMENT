@@ -227,10 +227,6 @@ app.post('/api/enroll', async (req, res) => {
             }
         }
         
-        // Generate unique ID using timestamp
-        const enrollmentId = Date.now();
-        enrollmentData.id = enrollmentId;
-        
         // Generate formatted enrollment ID (YYYY-XXXXX) - but not for old students
         let enrollmentID;
         if (enrollmentData.enrollmentID) {

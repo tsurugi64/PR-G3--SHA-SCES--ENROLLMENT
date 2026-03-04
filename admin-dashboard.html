@@ -1295,7 +1295,7 @@ function renderTable() {
         
         html += `
             <tr>
-                <td>${enrollment.id}</td>
+                <td>${enrollment.enrollmentID}</td>
                 <td>${s.lrn}</td>
                 <td><strong>${s.lastName}, ${s.firstName}${s.middleName ? ' ' + s.middleName : ''}</strong></td>
                 <td>${s.age || 'N/A'}</td>
@@ -1409,6 +1409,10 @@ function viewStudent(index) {
     const s = student.studentInfo;
     
     let html = `
+        <div class="view-field">
+            <div class="view-label">Enrollment ID</div>
+            <div class="view-value"><strong>${student.enrollmentID}</strong></div>
+        </div>
         <div class="view-field">
             <div class="view-label">Full Name</div>
             <div class="view-value"><strong>${s.lastName}, ${s.firstName}</strong></div>
@@ -1665,7 +1669,7 @@ function exportStudentsToCSV() {
         return;
     }
 
-    let csv = 'ID,Full Name,Age,Gender,Grade,Strand,Father,Mother,Contact Number,Email,Province,City,Barangay,Emergency Contact,GWA\n';
+    let csv = 'ID,LRN,Full Name,Age,Gender,Grade,Strand,Father,Mother,Contact Number,Email,Province,City,Barangay,Emergency Contact,GWA\n';
 
     filteredStudents.forEach((enrollment, index) => {
         const s = enrollment.studentInfo;
@@ -1673,7 +1677,7 @@ function exportStudentsToCSV() {
         const a = enrollment.addressInfo;
         const e = enrollment.emergencyContact;
         
-        csv += `"${index + 1}","${s.lastName}, ${s.firstName}","${s.age || 'N/A'}","${s.sex}","${s.gradeLevel}","${s.strand}","${p.fatherName || 'N/A'}","${p.motherName || 'N/A'}","${s.contactNumber || 'N/A'}","${s.email || 'N/A'}","${a.province || 'N/A'}","${a.city || 'N/A'}","${a.barangay || 'N/A'}","${e.name || 'N/A'}","${s.gwa || 'N/A'}"\n`;
+        csv += `"${enrollment.enrollmentID}","${s.lrn}","${s.lastName}, ${s.firstName}","${s.age || 'N/A'}","${s.sex}","${s.gradeLevel}","${s.strand}","${p.fatherName || 'N/A'}","${p.motherName || 'N/A'}","${s.contactNumber || 'N/A'}","${s.email || 'N/A'}","${a.province || 'N/A'}","${a.city || 'N/A'}","${a.barangay || 'N/A'}","${e.name || 'N/A'}","${s.gwa || 'N/A'}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
