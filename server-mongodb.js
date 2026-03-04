@@ -174,14 +174,20 @@ app.post('/api/old-student/verify-lrn', async (req, res) => {
 // ===== HELPER FUNCTION: Generate Enrollment ID =====
 async function generateEnrollmentID(gradeLevel) {
     const year = new Date().getFullYear();
-    // Get count of enrollments for this year
-    const count = await Enrollment.countDocuments({
-        enrollmentDate: {
-            $gte: new Date(year, 0, 1),
-            $lt: new Date(year + 1, 0, 1)
-        }
-    });
-    const sequentialNumber = String(count + 1).padStart(5, '0');
+    
+    // Find the highest sequential number used this year (including deleted records)
+    const allEnrollments = await Enrollment.find({
+        enrollmentID: { $regex: `^${year}-` }
+    }, { enrollmentID: 1 }).sort({ enrollmentID: -1 }).limit(1);
+    
+    let nextNumber = 1;
+    if (allEnrollments.length > 0) {
+        const lastID = allEnrollments[0].enrollmentID;
+        const lastNumber = parseInt(lastID.split('-')[1]);
+        nextNumber = lastNumber + 1;
+    }
+    
+    const sequentialNumber = String(nextNumber).padStart(5, '0');
     return `${year}-${sequentialNumber}`;
 }
 

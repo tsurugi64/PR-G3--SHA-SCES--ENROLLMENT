@@ -1216,7 +1216,7 @@ function searchStudents() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     filteredStudents = allStudents.filter(student => {
         const s = student.studentInfo;
-        return (s.firstName + ' ' + s.lastName).toLowerCase().includes(searchTerm) ||
+        return (s.lastName + ', ' + s.firstName).toLowerCase().includes(searchTerm) ||
                s.lrn.toString().includes(searchTerm) ||
                s.email.toLowerCase().includes(searchTerm);
     });
@@ -1297,7 +1297,7 @@ function renderTable() {
             <tr>
                 <td>${enrollment.id}</td>
                 <td>${s.lrn}</td>
-                <td><strong>${s.firstName} ${s.middleName ? s.middleName + ' ' : ''}${s.lastName}</strong></td>
+                <td><strong>${s.lastName}, ${s.firstName}${s.middleName ? ' ' + s.middleName : ''}</strong></td>
                 <td>${s.age || 'N/A'}</td>
                 <td title="Click to filter by gender" onclick="filterByGender('${s.sex}'); event.stopPropagation();" style="cursor: pointer; font-weight: 600; color: #00A693; transition: 0.2s;" onmouseover="this.style.background='#e8f5f5'; this.style.borderRadius='4px';" onmouseout="this.style.background='transparent';">${s.sex ? s.sex.charAt(0).toUpperCase() + s.sex.slice(1) : 'N/A'}</td>
                 <td>Grade ${s.gradeLevel}</td>
@@ -1411,7 +1411,7 @@ function viewStudent(index) {
     let html = `
         <div class="view-field">
             <div class="view-label">Full Name</div>
-            <div class="view-value"><strong>${s.firstName} ${s.lastName}</strong></div>
+            <div class="view-value"><strong>${s.lastName}, ${s.firstName}</strong></div>
         </div>
         <div class="view-field">
             <div class="view-label">LRN (Learner Reference Number)</div>
@@ -1625,7 +1625,7 @@ function saveStudent(event) {
 
 function deleteStudent(index) {
     const student = filteredStudents[index];
-    const studentName = `${student.studentInfo.firstName} ${student.studentInfo.lastName}`;
+    const studentName = `${student.studentInfo.lastName}, ${student.studentInfo.firstName}`;
     
     if (confirm(`Are you sure you want to delete ${studentName}? This action cannot be undone.`)) {
         const studentId = student.id;
@@ -1673,7 +1673,7 @@ function exportStudentsToCSV() {
         const a = enrollment.addressInfo;
         const e = enrollment.emergencyContact;
         
-        csv += `"${index + 1}","${s.firstName} ${s.lastName}","${s.age || 'N/A'}","${s.sex}","${s.gradeLevel}","${s.strand}","${p.fatherName || 'N/A'}","${p.motherName || 'N/A'}","${s.contactNumber || 'N/A'}","${s.email || 'N/A'}","${a.province || 'N/A'}","${a.city || 'N/A'}","${a.barangay || 'N/A'}","${e.name || 'N/A'}","${s.gwa || 'N/A'}"\n`;
+        csv += `"${index + 1}","${s.lastName}, ${s.firstName}","${s.age || 'N/A'}","${s.sex}","${s.gradeLevel}","${s.strand}","${p.fatherName || 'N/A'}","${p.motherName || 'N/A'}","${s.contactNumber || 'N/A'}","${s.email || 'N/A'}","${a.province || 'N/A'}","${a.city || 'N/A'}","${a.barangay || 'N/A'}","${e.name || 'N/A'}","${s.gwa || 'N/A'}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
