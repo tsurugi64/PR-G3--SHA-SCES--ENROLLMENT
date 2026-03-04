@@ -556,6 +556,7 @@ app.post('/api/teacher/enrollments/:id/reject', (req, res) => {
             message: 'Error rejecting enrollment'
         });
     }
+});
 
 // ========== EMAIL VERIFICATION SYSTEM ==========
 
