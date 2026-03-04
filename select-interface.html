@@ -454,7 +454,7 @@
     function showMessage(text, type = 'info') {
       const msgDiv = document.getElementById('message');
       msgDiv.textContent = text;
-      msgDiv.className = `message ${type}`;
+      msgDiv.className = 'message ' + type;
     }
 
     // Step 1: Send verification code
@@ -462,26 +462,31 @@
       e.preventDefault();
       
       const email = document.getElementById('email').value.trim();
-      console.log(`📧 [EMAIL] Form submitted. Email: ${email}`);\n      
+      console.log('📧 [EMAIL] Form submitted. Email: ' + email);
       const btn = document.getElementById('sendCodeBtn');
       
       btn.disabled = true;
       btn.textContent = '⏳ Sending...';
       
       try {
-        console.log(`📡 [EMAIL] Sending POST /api/admin/request-code with email ${email}`);\n        const response = await fetch('/api/admin/request-code', {
+        console.log('📡 [EMAIL] Sending POST /api/admin/request-code with email ' + email);
+        const response = await fetch('/api/admin/request-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
         });
         
-        console.log(`📡 [EMAIL] Response status: ${response.status}`);\n        const data = await response.json();
+        console.log('📡 [EMAIL] Response status: ' + response.status);
+        const data = await response.json();
         
-        console.log(`📊 [EMAIL] Response data:`, data);\n        if (data.success) {
-          console.log(`✅ [EMAIL] Code request successful for ${email}`);\n          verificationEmail = email;
-          document.getElementById('verifyEmailDisplay').textContent = `Code sent to ${email}`;
+        console.log('📊 [EMAIL] Response data:', data);
+        if (data.success) {
+          console.log('✅ [EMAIL] Code request successful for ' + email);
+          verificationEmail = email;
+          document.getElementById('verifyEmailDisplay').textContent = 'Code sent to ' + email;
           
-          console.log(`📍 [EMAIL] Moving to step 2`);\n          document.getElementById('step-1').style.display = 'none';
+          console.log('📍 [EMAIL] Moving to step 2');
+          document.getElementById('step-1').style.display = 'none';
           document.getElementById('step-2').style.display = 'block';
           
           showMessage('✅ Verification code sent! Check your email.', 'success');
@@ -490,11 +495,14 @@
           startResendCooldown();
           
           document.getElementById('code').focus();
-          console.log(`🔍 [EMAIL] Waiting for user to enter code...`);\n        } else {
-          console.warn(`❌ [EMAIL] Request failed: ${data.message}`);\n          showMessage('❌ ' + data.message, 'error');
+          console.log('🔍 [EMAIL] Waiting for user to enter code...');
+        } else {
+          console.warn('❌ [EMAIL] Request failed: ' + data.message);
+          showMessage('❌ ' + data.message, 'error');
         }
       } catch (error) {
-        console.error(`❌ [ERROR] Fetch error during email send:`, error);\n        showMessage('❌ Error: ' + error.message, 'error');
+        console.error('❌ [ERROR] Fetch error during email send:', error);
+        showMessage('❌ Error: ' + error.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '📧 Send Verification Code';
@@ -506,20 +514,23 @@
       e.preventDefault();
       
       const codeInput = document.getElementById('code').value;
-      console.log(`🔍 [VERIFY] Form submitted. Raw code input: "${codeInput}"`);
+      console.log('🔍 [VERIFY] Form submitted. Raw code input: ' + codeInput);
       
       const code = codeInput.replace(/\D/g, '');
-      console.log(`🔍 [VERIFY] Code after digit filtering: "${code}" (length: ${code.length})`);\n      
+      console.log('🔍 [VERIFY] Code after digit filtering: "' + code + '" (length: ' + code.length + ')');
+      
       const btn = document.getElementById('verifyBtn');
       
       if (code.length !== 6) {
-        console.warn(`❌ [SECURITY] Invalid code length: ${code.length} (need 6)`);\n        showMessage('❌ Code must be 6 digits', 'error');
+        console.warn('❌ [SECURITY] Invalid code length: ' + code.length + ' (need 6)');
+        showMessage('❌ Code must be 6 digits', 'error');
         return;
       }
       
       btn.disabled = true;
       btn.textContent = '⏳ Verifying...';
-      console.log(`✅ [VERIFY] Sending code ${code} to /api/admin/verify-email-code for email ${verificationEmail}`);\n      
+      console.log('✅ [VERIFY] Sending code ' + code + ' to /api/admin/verify-email-code for email ' + verificationEmail);
+      
       try {
         const response = await fetch('/api/admin/verify-email-code', {
           method: 'POST',
@@ -527,27 +538,33 @@
           body: JSON.stringify({ email: verificationEmail, code })
         });
         
-        console.log(`📡 [VERIFY] Response status: ${response.status}`);\n        
+        console.log('📡 [VERIFY] Response status: ' + response.status);
         const data = await response.json();
         
-        console.log(`📊 [VERIFY] Response data:`, data);\n        
+        console.log('📊 [VERIFY] Response data:', data);
+        
         if (data.success) {
-          console.log(`✅ [VERIFY] Email verification successful for ${verificationEmail}`);\n          showMessage('✅ Email verified! Redirecting...', 'success');
+          console.log('✅ [VERIFY] Email verification successful for ' + verificationEmail);
+          showMessage('✅ Email verified! Redirecting...', 'success');
           
           if (codeTimerInterval) clearInterval(codeTimerInterval);
           
           // Store verified email and redirect
           setTimeout(() => {
-            console.log(`📍 [REDIRECT] Setting sessionStorage.verifiedAdminEmail = "${verificationEmail}"`);\n            sessionStorage.setItem('verifiedAdminEmail', verificationEmail);
-            console.log(`📍 [REDIRECT] Navigating to admin-create.html`);\n            window.location.href = 'admin-create.html';
+            console.log('📍 [REDIRECT] Setting sessionStorage.verifiedAdminEmail = "' + verificationEmail + '"');
+            sessionStorage.setItem('verifiedAdminEmail', verificationEmail);
+            console.log('📍 [REDIRECT] Navigating to admin-create.html');
+            window.location.href = 'admin-create.html';
           }, 1500);
         } else {
-          console.warn(`❌ [VERIFY] Verification failed: ${data.message}`);\n          showMessage('❌ ' + data.message, 'error');
+          console.warn('❌ [VERIFY] Verification failed: ' + data.message);
+          showMessage('❌ ' + data.message, 'error');
           document.getElementById('code').value = '';
           document.getElementById('code').focus();
         }
       } catch (error) {
-        console.error(`❌ [ERROR] Fetch error during verification:`, error);\n        showMessage('❌ Error: ' + error.message, 'error');
+        console.error('❌ [ERROR] Fetch error during verification:', error);
+        showMessage('❌ Error: ' + error.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '✅ Verify & Continue';
@@ -561,7 +578,7 @@
         const minutes = Math.floor(remaining / 60000);
         const seconds = Math.floor((remaining % 60000) / 1000);
         
-        document.getElementById('timerCount').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        document.getElementById('timerCount').textContent = minutes + ':' + seconds.toString().padStart(2, '0');
         
         if (remaining < 300000) {
           document.getElementById('timer').classList.add('warning');
