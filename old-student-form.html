@@ -313,6 +313,7 @@
         body.dark input[type="text"],
         body.dark input[type="password"] {
             color: #e0fffb;
+            background: var(--input-bg);
         }
 
         body.dark .form-title {
@@ -326,6 +327,31 @@
         body.dark small {
             color: #b0d0cd;
         }
+
+        body.dark .message {
+            background: var(--card-bg);
+        }
+
+        body.dark .btn-secondary {
+            background: #2a3a39;
+            color: #e0fffb;
+        }
+
+        body.dark .btn-secondary:hover {
+            background: #3a4a49;
+        }
+
+        body.dark .progress-step {
+            background: #2a4a47;
+        }
+
+        body.dark .progress-step.active {
+            background: #00A693;
+        }
+
+        body.dark .progress-step.completed {
+            background: #4caf50;
+        }
     </style>
 </head>
 <body>
@@ -335,7 +361,7 @@
             <div class="logo"><img src="sha_logo.png" alt="SHA Logo"></div>
             <div class="school-name">Sacred Heart Academy of Sta. Maria (Bulacan), Inc.</div>
         </a>
-        <button class="dark-btn" onclick="toggleDarkMode()" id="modeBtn">🌙 Dark Mode</button>
+        <button class="dark-btn" onclick="toggleDarkMode()" id="modeBtn">Dark Mode</button>
     </div>
 
     <div class="question-section">
@@ -430,9 +456,9 @@
         function updateButtonText() {
             const btn = document.getElementById('modeBtn');
             if (document.body.classList.contains('dark')) {
-                btn.textContent = '☀️ Light Mode';
+                btn.textContent = 'Light Mode';
             } else {
-                btn.textContent = '🌙 Dark Mode';
+                btn.textContent = 'Dark Mode';
             }
         }
 
@@ -453,7 +479,7 @@
             const messageBox = document.getElementById('messageBox1');
 
             if (!enrollmentID) {
-                showMessage(messageBox, '❌ Please enter an enrollment ID', 'error');
+                showMessage(messageBox, 'Please enter an enrollment ID', 'error');
                 return;
             }
 
@@ -468,7 +494,7 @@
 
                 if (result.success) {
                     currentEnrollmentData = result;
-                    showMessage(messageBox, '✅ Enrollment ID found!', 'success');
+                    showMessage(messageBox, 'Enrollment ID found!', 'success');
                     
                     setTimeout(() => {
                         goToStep2();
@@ -478,14 +504,14 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showMessage(messageBox, '❌ Error searching enrollment. Please try again.', 'error');
+                showMessage(messageBox, 'Error searching enrollment. Please try again.', 'error');
             }
         }
 
         // Confirm student identity
         function confirmIdentity() {
             const messageBox = document.getElementById('messageBox2');
-            showMessage(messageBox, '✅ Identity confirmed!', 'success');
+            showMessage(messageBox, 'Identity confirmed!', 'success');
 
             setTimeout(() => {
                 goToStep3();
@@ -498,7 +524,7 @@
             const messageBox = document.getElementById('messageBox3');
 
             if (!lrn) {
-                showMessage(messageBox, '❌ Please enter your LRN', 'error');
+                showMessage(messageBox, 'Please enter your LRN', 'error');
                 return;
             }
 
@@ -515,7 +541,7 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    showMessage(messageBox, '✅ LRN verified! Redirecting...', 'success');
+                    showMessage(messageBox, 'LRN verified! Redirecting...', 'success');
                     
                     setTimeout(() => {
                         // Store old student data in session
@@ -528,11 +554,11 @@
                         window.location.href = 'final-update.html';
                     }, 1500);
                 } else {
-                    showMessage(messageBox, '❌ ' + result.message, 'error');
+                    showMessage(messageBox, result.message, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showMessage(messageBox, '❌ Error verifying LRN. Please try again.', 'error');
+                showMessage(messageBox, 'Error verifying LRN. Please try again.', 'error');
             }
         }
 
