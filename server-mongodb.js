@@ -222,6 +222,7 @@ async function generateEnrollmentID(gradeLevel) {
 app.post('/api/enroll', async (req, res) => {
     try {
         const enrollmentData = req.body;
+        let enrollmentID = null;
         
         // Validate required fields
         if (!enrollmentData.studentInfo?.lrn) {
@@ -238,15 +239,13 @@ app.post('/api/enroll', async (req, res) => {
             });
         }
 
-        // Always set id to null (legacy field, not used anymore)
-        enrollmentData.id = null;
+        // Remove legacy id field if it exists
+        delete enrollmentData.id;
 
         // Check if student with this LRN already exists
         let existingEnrollment = await Enrollment.findOne({
             'studentInfo.lrn': enrollmentData.studentInfo.lrn
         });
-
-        let enrollmentID;
         
         if (existingEnrollment) {
             // Student already enrolled - reuse their existing ID (re-enrollment)
@@ -286,7 +285,6 @@ app.post('/api/enroll', async (req, res) => {
         if (error.code === 11000) {
             const field = Object.keys(error.keyPattern)[0];
             
-            // If duplicate enrollmentID, it's already handled above (re-enrollment)
             if (field === 'enrollmentID') {
                 return res.status(400).json({
                     success: false,
@@ -294,7 +292,6 @@ app.post('/api/enroll', async (req, res) => {
                 });
             }
             
-            // If duplicate LRN, it's a re-enrollment (already handled above)
             if (field === 'lrn') {
                 return res.status(400).json({
                     success: false,
@@ -302,12 +299,9 @@ app.post('/api/enroll', async (req, res) => {
                 });
             }
             
-            // For any other duplicate (including legacy 'id' field), just log and ignore
-            console.warn(`⚠️ Ignoring duplicate key on field: ${field}`);
-            return res.json({ 
-                success: true, 
-                message: 'Enrollment saved successfully',
-                enrollmentId: enrollmentData.enrollmentID
+            return res.status(400).json({
+                success: false,
+                message: `Duplicate key error on field: ${field}`
             });
         }
         
