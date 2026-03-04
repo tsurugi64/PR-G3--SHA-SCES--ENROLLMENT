@@ -1162,11 +1162,8 @@ function validateForm(){
         document.getElementById('oldStudentSearch').style.display = 'none';
         document.getElementById('gradeRequirementsSection').style.display = 'none';
         
-        // Show enrollment ID modal
-        document.getElementById('enrollmentIDModal').style.display = 'flex';
-        document.getElementById('enrollmentIDErrorMsg').classList.remove('show');
-        document.getElementById('enrollmentIDSuccessMsg').classList.remove('show');
-        document.getElementById('enrollmentIDInput').value = '';
+        // Redirect to dedicated old student form
+        window.location.href = 'old-student-form.html';
         return;
     } else {
         // If new student, hide old student modal and show new student sections
