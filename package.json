@@ -4,7 +4,7 @@
   "description": "Enrollment system with local database for Sacred Heart Academy",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server-mongodb.js",
     "dev": "node server.js",
     "dev-local": "node server-mongodb.js"
   },
