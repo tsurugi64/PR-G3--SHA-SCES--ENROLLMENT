@@ -1503,7 +1503,7 @@ function editStudent(index) {
     const e = student.emergencyContact;
     
     currentEditingStudentIndex = index;
-    currentEditingStudentId = student.id;
+    currentEditingStudentId = student._id;
     
     // Student Information
     document.getElementById('editFirstName').value = s.firstName || '';
@@ -1609,7 +1609,7 @@ function saveStudent(event) {
     .then(response => response.json())
     .then(data => {
         // Update the local data
-        const studentToUpdate = allStudents.find(s => s.id === currentEditingStudentId);
+        const studentToUpdate = allStudents.find(s => s._id === currentEditingStudentId);
         if (studentToUpdate) {
             studentToUpdate.studentInfo = updatedStudent.studentInfo;
             studentToUpdate.parentsInfo = updatedStudent.parentsInfo;
@@ -1632,14 +1632,14 @@ function deleteStudent(index) {
     const studentName = `${student.studentInfo.lastName}, ${student.studentInfo.firstName}`;
     
     if (confirm(`Are you sure you want to delete ${studentName}? This action cannot be undone.`)) {
-        const studentId = student.id;
+        const studentId = student._id;
         
         fetch(`/api/enrollments/${studentId}`, { 
             method: 'DELETE'
         })
         .then(response => response.json())
         .then(data => {
-            allStudents = allStudents.filter(s => s.id !== studentId);
+            allStudents = allStudents.filter(s => s._id !== studentId);
             applyFilters();
             alert(`Student ${studentName} has been deleted successfully!`);
         })
