@@ -829,7 +829,10 @@ app.post('/api/admin/verify-email-code', async (req, res) => {
             });
         }
         
-        // Code is valid!
+        // Code is valid! Mark as verified for account creation
+        verificationRecord.verified = true;
+        await verificationRecord.save();
+        
         res.json({ 
             success: true, 
             message: 'Email verified successfully',
@@ -853,6 +856,26 @@ app.post('/api/admin/create-account', async (req, res) => {
             return res.status(400).json({ 
                 success: false, 
                 message: 'Email, username, and password are required' 
+            });
+        }
+        
+        // CRITICAL: Verify email is authorized
+        const isAuthorized = approvedTeachers.some(t => t.toLowerCase() === email.toLowerCase());
+        if (!isAuthorized) {
+            console.warn(`🚨 SECURITY: Unauthorized email attempt to create account: ${email}`);
+            return res.status(403).json({ 
+                success: false, 
+                message: 'This email is not authorized to create an admin account' 
+            });
+        }
+        
+        // CRITICAL: Verify email code was recently verified (prevent direct API calls)
+        const verificationRecord = await VerificationCode.findOne({ email: { $regex: email, $options: 'i' } });
+        if (!verificationRecord || verificationRecord.verified !== true) {
+            console.warn(`🚨 SECURITY: Email code not verified before account creation: ${email}`);
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Email must be verified first' 
             });
         }
         
@@ -884,11 +907,14 @@ app.post('/api/admin/create-account', async (req, res) => {
         
         await newAccount.save();
         
+        // Clear the verification record after successful account creation
+        await VerificationCode.deleteOne({ email: { $regex: email, $options: 'i' } });
+        
         console.log(`✅ New admin account created: ${username} (${email})`);
         
         res.json({ 
             success: true, 
-            message: 'Account created successfully! You can now login.',
+            message: 'Account created successfully! Please login with your credentials.',
             account: {
                 id: newAccount._id,
                 username: newAccount.username,
