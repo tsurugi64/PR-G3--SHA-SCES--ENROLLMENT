@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const enrollmentSchema = new mongoose.Schema({
+    id: {
+        type: Number,
+        sparse: true
+    },
     enrollmentID: {
         type: String,
         unique: true,

@@ -189,27 +189,17 @@ app.post('/api/old-student/verify-lrn', async (req, res) => {
 async function generateEnrollmentID(gradeLevel) {
     const year = new Date().getFullYear();
     
-    // Get ALL enrollments for this year, sorted by enrollmentID
-    const allEnrollments = await Enrollment.find({
+    // Get the highest enrollmentID for this year
+    const lastEnrollment = await Enrollment.findOne({
         enrollmentID: { $regex: `^${year}-` }
-    }, { enrollmentID: 1 }).sort({ enrollmentID: 1 });
+    }, { enrollmentID: 1 }).sort({ enrollmentID: -1 });
     
-    // Find the first gap in the sequence starting from 1
     let nextNumber = 1;
     
-    if (allEnrollments.length > 0) {
-        // Check each position starting from 1
-        for (let i = 0; i < allEnrollments.length; i++) {
-            const currentNumber = parseInt(allEnrollments[i].enrollmentID.split('-')[1]);
-            
-            // If current number is higher than expected, we found a gap
-            if (currentNumber > nextNumber) {
-                break; // Use nextNumber (the gap)
-            }
-            
-            // Move to next number to check
-            nextNumber = currentNumber + 1;
-        }
+    if (lastEnrollment) {
+        // Extract number from last ID and add 1
+        const lastNumber = parseInt(lastEnrollment.enrollmentID.split('-')[1]);
+        nextNumber = lastNumber + 1;
     }
     
     const sequentialNumber = String(nextNumber).padStart(5, '0');
@@ -221,7 +211,7 @@ async function generateEnrollmentID(gradeLevel) {
 // Save/Create new enrollment
 app.post('/api/enroll', async (req, res) => {
     try {
-        const enrollmentData = req.body;
+        let enrollmentData = req.body;
         let enrollmentID = null;
         
         // Validate required fields
@@ -239,7 +229,7 @@ app.post('/api/enroll', async (req, res) => {
             });
         }
 
-        // Remove legacy id field if it exists
+        // Remove problematic legacy id field
         delete enrollmentData.id;
 
         // Check if student with this LRN already exists
@@ -255,7 +245,7 @@ app.post('/api/enroll', async (req, res) => {
             // Update their existing record
             enrollmentData.enrollmentDate = new Date();
             await Enrollment.updateOne(
-                { enrollmentID: enrollmentID },
+                { _id: existingEnrollment._id },
                 { $set: enrollmentData }
             );
             
@@ -284,6 +274,27 @@ app.post('/api/enroll', async (req, res) => {
         // Handle MongoDB duplicate key errors
         if (error.code === 11000) {
             const field = Object.keys(error.keyPattern)[0];
+            
+            // If it's just the legacy 'id' field, retry without it
+            if (field === 'id') {
+                console.warn(`⚠️ Ignoring duplicate id field error, retrying...`);
+                try {
+                    const enrollment = new Enrollment(req.body);
+                    enrollment.id = undefined;
+                    await enrollment.save();
+                    return res.json({ 
+                        success: true, 
+                        message: 'Enrollment saved successfully',
+                        enrollmentId: enrollment.enrollmentID
+                    });
+                } catch (retryError) {
+                    console.error('Retry failed:', retryError.message);
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Error saving enrollment: ' + retryError.message
+                    });
+                }
+            }
             
             if (field === 'enrollmentID') {
                 return res.status(400).json({
