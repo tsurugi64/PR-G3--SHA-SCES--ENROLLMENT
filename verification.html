@@ -968,7 +968,13 @@ function selectStudentType(type) {
     // Set the student type radio button
     document.querySelector(`input[name="studentType"][value="${type}"]`).checked = true;
     
-    // Trigger the update requirements
+    // If old student, redirect immediately
+    if (type === 'old') {
+        window.location.href = 'old-student-form.html';
+        return;
+    }
+    
+    // Trigger the update requirements for new students
     updateRequirements();
 }
 
