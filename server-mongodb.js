@@ -593,15 +593,23 @@ app.post('/api/admin/login', async (req, res) => {
             });
         }
         
-        // Find account
-        const account = await AdminAccount.findOne({ username, password });
+        const trimmedUsername = username.trim();
+        
+        // Find account (case-insensitive username)
+        const account = await AdminAccount.findOne({ 
+            username: { $regex: `^${trimmedUsername.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
+            password: password
+        });
         
         if (!account) {
+            console.warn(`❌ Login failed for username: ${trimmedUsername}`);
             return res.status(401).json({ 
                 success: false, 
                 message: 'Invalid username or password' 
             });
         }
+        
+        console.log(`✅ Admin login successful: ${trimmedUsername}`);
         
         res.json({ 
             success: true, 
