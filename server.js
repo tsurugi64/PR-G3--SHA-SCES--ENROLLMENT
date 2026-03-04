@@ -94,7 +94,25 @@ function writeEnrollments(data) {
 app.post('/api/enroll', (req, res) => {
     try {
         const enrollmentData = req.body;
+        
+        // Validate request data
+        if (!enrollmentData || typeof enrollmentData !== 'object') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid request data' 
+            });
+        }
+        
         const db = readEnrollments();
+        
+        // Ensure enrollments array exists
+        if (!db.enrollments || !Array.isArray(db.enrollments)) {
+            console.error('Invalid database structure:', db);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Database error' 
+            });
+        }
         
         // Add timestamp and unique ID
         enrollmentData.id = Date.now();
@@ -103,8 +121,12 @@ app.post('/api/enroll', (req, res) => {
         // Generate formatted enrollment ID: YYYY-000001
         const currentYear = new Date().getFullYear();
         const enrollmentsThisYear = db.enrollments.filter(e => {
-            const eYear = new Date(e.enrollmentDate).getFullYear();
-            return eYear === currentYear;
+            try {
+                const eYear = new Date(e.enrollmentDate).getFullYear();
+                return eYear === currentYear;
+            } catch (e) {
+                return false;
+            }
         }).length;
         const sequentialNumber = String(enrollmentsThisYear + 1).padStart(6, '0');
         enrollmentData.enrollmentID = `${currentYear}-${sequentialNumber}`;
@@ -124,14 +146,14 @@ app.post('/api/enroll', (req, res) => {
         } else {
             res.status(500).json({ 
                 success: false, 
-                message: 'Failed to save enrollment' 
+                message: 'Failed to save enrollment to database' 
             });
         }
     } catch (error) {
         console.error('Error processing enrollment:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Error processing enrollment: ' + error.message 
+            message: 'Error: ' + error.message 
         });
     }
 });
