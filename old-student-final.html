@@ -1008,7 +1008,18 @@ function loadOldStudentData() {
             document.getElementById('lastName').value = studentInfo.lastName || '';
             document.getElementById('suffix').value = studentInfo.suffix || '';
             document.getElementById('sex').value = studentInfo.sex || '';
-            document.getElementById('dob').value = studentInfo.dateOfBirth || '';
+            
+            // Format and set Date of Birth (YYYY-MM-DD format)
+            if (studentInfo.dateOfBirth) {
+                const formattedDate = formatDateForInput(studentInfo.dateOfBirth);
+                document.getElementById('dob').value = formattedDate;
+                // Update Flatpickr value
+                const dobPicker = document.querySelector('#dob')._flatpickr;
+                if (dobPicker && formattedDate) {
+                    dobPicker.setDate(formattedDate, true);
+                }
+            }
+            
             document.getElementById('contactNumber').value = studentInfo.contactNumber || '';
             document.getElementById('email').value = studentInfo.email || '';
             document.getElementById('schoolLastAttended').value = studentInfo.schoolLastAttended || '';
@@ -1300,6 +1311,53 @@ function updateBarangays(){
         option.text = brgy;
         barangaySelect.add(option);
     });
+}
+
+// Helper function to format date to YYYY-MM-DD
+function formatDateForInput(dateString) {
+    if (!dateString) return '';
+    
+    let date;
+    
+    // Try to parse the date string
+    // Check if it's already in YYYY-MM-DD format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return dateString;
+    }
+    
+    // Try MM/DD/YYYY format
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
+        const parts = dateString.split('/');
+        const month = String(parts[0]).padStart(2, '0');
+        const day = String(parts[1]).padStart(2, '0');
+        const year = parts[2];
+        return `${year}-${month}-${day}`;
+    }
+    
+    // Try DD/MM/YYYY format
+    if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(dateString)) {
+        const parts = dateString.split('-');
+        const day = String(parts[0]).padStart(2, '0');
+        const month = String(parts[1]).padStart(2, '0');
+        const year = parts[2];
+        return `${year}-${month}-${day}`;
+    }
+    
+    // Try ISO format with time (remove time part)
+    if (/^\d{4}-\d{2}-\d{2}T/.test(dateString)) {
+        return dateString.split('T')[0];
+    }
+    
+    // Try to parse as Date object
+    date = new Date(dateString);
+    if (!isNaN(date.getTime())) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    return '';
 }
 
 // Initialize Flatpickr for Date of Birth
