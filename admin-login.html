@@ -226,6 +226,7 @@
         if (data.success) {
           // Store admin info in localStorage
           localStorage.setItem('adminUser', JSON.stringify(data.admin));
+          localStorage.setItem('userType', 'admin');
           showMessage('Login successful! Redirecting to dashboard...', 'success');
           setTimeout(() => {
             window.location.href = 'admin-dashboard.html';

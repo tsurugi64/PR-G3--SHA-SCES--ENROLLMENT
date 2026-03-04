@@ -1286,7 +1286,9 @@ function goToHome() {
     // Check user type from localStorage
     const userType = localStorage.getItem('userType') || 'student';
     
-    if (userType === 'teacher') {
+    if (userType === 'admin') {
+        window.location.href = 'FRONT PAGE.html';
+    } else if (userType === 'teacher') {
         window.location.href = 'Home.html';
     } else {
         window.location.href = 'home-for-student.html';

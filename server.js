@@ -100,6 +100,15 @@ app.post('/api/enroll', (req, res) => {
         enrollmentData.id = Date.now();
         enrollmentData.enrollmentDate = new Date().toISOString();
         
+        // Generate formatted enrollment ID: YYYY-000001
+        const currentYear = new Date().getFullYear();
+        const enrollmentsThisYear = db.enrollments.filter(e => {
+            const eYear = new Date(e.enrollmentDate).getFullYear();
+            return eYear === currentYear;
+        }).length;
+        const sequentialNumber = String(enrollmentsThisYear + 1).padStart(6, '0');
+        enrollmentData.enrollmentID = `${currentYear}-${sequentialNumber}`;
+        
         // Add to enrollments array
         db.enrollments.push(enrollmentData);
         
@@ -110,7 +119,7 @@ app.post('/api/enroll', (req, res) => {
             res.json({ 
                 success: true, 
                 message: 'Enrollment saved successfully',
-                enrollmentId: enrollmentData.id
+                enrollmentId: enrollmentData.enrollmentID
             });
         } else {
             res.status(500).json({ 
