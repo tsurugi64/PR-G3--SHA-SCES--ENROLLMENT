@@ -610,6 +610,7 @@
         });
 
         let currentEnrollmentData = null;
+        let enrollmentDataCache = null;  // Cache to preserve data across steps
 
         // Search for enrollment by ID
         async function searchEnrollment() {
@@ -639,7 +640,11 @@
                         return;
                     }
 
+                    // Store in both variables to preserve across steps
                     currentEnrollmentData = result;
+                    enrollmentDataCache = result.enrollmentData;
+                    console.log('Enrollment data cached:', enrollmentDataCache);
+                    
                     showMessage(messageBox, 'Enrollment ID found!', 'success');
                     
                     setTimeout(() => {
@@ -681,36 +686,40 @@
                 return;
             }
 
-            if (!currentEnrollmentData || !currentEnrollmentData.enrollmentID) {
-                showMessage(messageBox, 'Error: Enrollment data not found. Please go back and search again.', 'error');
+            // Use cached enrollment data
+            if (!enrollmentDataCache) {
+                console.error('❌ No cached enrollment data found!');
+                showMessage(messageBox, 'Error: Enrollment data was lost. Please go back and search again.', 'error');
                 return;
             }
 
             try {
+                console.log('Cached enrollment data exists:', !!enrollmentDataCache);
                 console.log('Verifying LRN:', lrn);
-                console.log('Enrollment ID:', currentEnrollmentData.enrollmentID);
-                console.log('Database LRN:', currentEnrollmentData.enrollmentData?.studentInfo?.lrn);
+                console.log('Database LRN:', enrollmentDataCache?.studentInfo?.lrn);
 
-                // Direct comparison first (before API call for debugging)
-                const storedLRN = currentEnrollmentData.enrollmentData?.studentInfo?.lrn;
+                // Direct comparison with cached data
+                const storedLRN = enrollmentDataCache?.studentInfo?.lrn;
                 if (storedLRN && storedLRN === lrn) {
-                    console.log('✅ LRN matches directly!');
+                    console.log('✅ LRN matches directly from cache!');
                     showMessage(messageBox, '✅ LRN verified! Redirecting...', 'success');
                     
                     setTimeout(() => {
                         // Store old student data in session
-                        sessionStorage.setItem('oldStudentData', JSON.stringify(currentEnrollmentData.enrollmentData));
+                        sessionStorage.setItem('oldStudentData', JSON.stringify(enrollmentDataCache));
                         sessionStorage.setItem('enrollmentID', currentEnrollmentData.enrollmentID);
                         sessionStorage.setItem('studentType', 'old');
-                        sessionStorage.setItem('gradeLevel', currentEnrollmentData.enrollmentData.studentInfo.gradeLevel);
+                        sessionStorage.setItem('gradeLevel', enrollmentDataCache.studentInfo.gradeLevel);
                         
+                        console.log('✅ Data stored in sessionStorage, redirecting to old-student-final.html');
                         // Redirect to old student final form
                         window.location.href = 'old-student-final.html';
                     }, 1500);
                     return;
                 }
 
-                // If direct match failed, try API verification
+                // If direct match failed, try API verification as backup
+                console.log('Direct match failed, trying API verification...');
                 const response = await fetch(`/api/old-student/verify-lrn`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
