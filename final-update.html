@@ -1242,30 +1242,39 @@ function calculateAge(dateOfBirth) {
 }
 
 // Celebration modal functions
+// Celebration modal functions
 function showCelebration(enrollmentId, gradeLevel, studentType) {
-    const modal = document.getElementById('celebrationModal');
-    const idDisplay = document.getElementById('enrollmentIdDisplay');
-    const detailsDisplay = document.getElementById('enrollmentDetails');
-    
-    // Safety check
-    if (!modal || !idDisplay || !detailsDisplay) {
-        console.error('Celebration modal elements not found');
-        alert('✅ Enrollment successful! Your ID: ' + enrollmentId);
-        return;
-    }
-    
-    // Set enrollment info
-    idDisplay.innerHTML = `<strong>Enrollment ID:</strong><br>${enrollmentId}`;
-    detailsDisplay.innerHTML = `
-        <strong>Grade Level:</strong> ${gradeLevel || 'N/A'}<br>
-        <strong>Student Type:</strong> ${studentType || 'N/A'}
-    `;
-    
-    // Show modal
-    modal.style.display = 'flex';
-    
-    // Create confetti
-    createConfetti();
+    // Use a small delay to ensure DOM is ready
+    setTimeout(() => {
+        const modal = document.querySelector('#celebrationModal');
+        const idDisplay = document.querySelector('#enrollmentIdDisplay');
+        const detailsDisplay = document.querySelector('#enrollmentDetails');
+        
+        console.log('Modal found:', !!modal);
+        console.log('ID Display found:', !!idDisplay);
+        console.log('Details Display found:', !!detailsDisplay);
+        
+        // Safety check
+        if (!modal || !idDisplay || !detailsDisplay) {
+            console.error('Celebration modal elements not found');
+            console.log('DOM content:', document.body.innerHTML.substring(0, 500));
+            alert('✅ Enrollment successful! Your ID: ' + enrollmentId);
+            return;
+        }
+        
+        // Set enrollment info
+        idDisplay.innerHTML = `<strong>Enrollment ID:</strong><br>${enrollmentId}`;
+        detailsDisplay.innerHTML = `
+            <strong>Grade Level:</strong> ${gradeLevel || 'N/A'}<br>
+            <strong>Student Type:</strong> ${studentType || 'N/A'}
+        `;
+        
+        // Show modal
+        modal.style.display = 'flex';
+        
+        // Create confetti
+        createConfetti();
+    }, 100);
 }
 
 function goToHome() {
