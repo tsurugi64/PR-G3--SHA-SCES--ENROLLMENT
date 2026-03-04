@@ -75,6 +75,16 @@
             background: #004d47;
         }
 
+        .btn-enroll {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-enroll:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -311,6 +321,9 @@
 
 <div class="container">
     <div class="controls">
+        <button class="btn btn-enroll" onclick="enrollStudent()">
+            <i class="fas fa-plus"></i> Enroll A Student
+        </button>
         <button class="btn btn-refresh" onclick="loadEnrollments()">
             Refresh
         </button>
@@ -1014,6 +1027,13 @@ async function saveEnrollment(event) {
 }
 
 // Load enrollments on page load
+function enrollStudent() {
+    // Set admin flag so verification flow returns to admin dashboard
+    localStorage.setItem('userType', 'admin');
+    // Navigate to verification to start enrollment
+    window.location.href = 'verification.html';
+}
+
 loadEnrollments();
 </script>
 
