@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -13,8 +12,8 @@
     }
     
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #e9ffff, #ffffff, #e0faf6);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #00A693 0%, #008f80 100%);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -23,24 +22,34 @@
     }
     
     .container {
-      background: linear-gradient(145deg, #ffffff, #e8f8f5);
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
       padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+      max-width: 450px;
       width: 100%;
-      max-width: 400px;
     }
-    
-    h1 {
-      color: #00A693;
-      margin-bottom: 10px;
-      font-size: 1.8em;
-    }
-    
-    .subtitle {
-      color: #666;
+
+    .header {
+      text-align: center;
       margin-bottom: 30px;
-      font-size: 0.9em;
+    }
+
+    .header img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 15px;
+    }
+
+    .header h1 {
+      color: #003F39;
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 0.95em;
     }
     
     .form-group {
@@ -50,27 +59,25 @@
     label {
       display: block;
       margin-bottom: 8px;
-      color: #003f39;
+      color: #003F39;
       font-weight: 600;
       font-size: 0.95em;
     }
     
     input {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #b5d8d2;
-      border-radius: 10px;
-      background: linear-gradient(145deg, #ffffff, #eefaf7);
-      font-family: 'Poppins', sans-serif;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: inherit;
       font-size: 1em;
-      transition: 0.25s;
+      transition: border-color 0.3s;
     }
     
     input:focus {
       outline: none;
       border-color: #00A693;
-      box-shadow: 0 0 8px rgba(0, 166, 147, 0.35);
-      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 166, 147, 0.1);
     }
     
     .password-group {
@@ -87,29 +94,50 @@
     
     .show-password input {
       width: auto;
+      border: none;
+      box-shadow: none;
+      cursor: pointer;
+    }
+
+    .show-password label {
+      margin: 0;
+      font-weight: 500;
     }
     
     .btn {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(145deg, #00b4a4, #008f80);
+      background: linear-gradient(135deg, #00A693 0%, #008f80 100%);
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 1em;
       font-weight: 600;
       cursor: pointer;
-      transition: 0.25s;
-      margin-top: 10px;
+      transition: 0.3s;
+      margin-bottom: 10px;
     }
     
-    .btn:hover {
-      transform: scale(1.04);
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 166, 147, 0.4);
     }
     
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #00A693;
+      border: 2px solid #00A693;
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: #f0f8f6;
+      transform: translateY(-2px);
     }
     
     .link {
@@ -128,10 +156,11 @@
     }
     
     .message {
-      padding: 12px;
+      padding: 12px 15px;
       border-radius: 8px;
       margin-bottom: 20px;
       display: none;
+      font-size: 0.95em;
     }
     
     .message.success {
@@ -147,27 +176,30 @@
       border: 1px solid #f5c6cb;
       display: block;
     }
-    
+
     .info-box {
-      background: #e7f3ff;
+      background: #f0f8f6;
       border-left: 4px solid #00A693;
       padding: 12px;
       border-radius: 5px;
       margin-bottom: 20px;
       font-size: 0.85em;
-      color: #003f39;
+      color: #003F39;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Admin Login</h1>
-    <p class="subtitle">Sign in to access the enrollment dashboard</p>
+    <div class="header">
+      <img src="sha_logo.png" alt="SHA Logo">
+      <h1>Admin Login</h1>
+      <p>Sign in to access the enrollment dashboard</p>
+    </div>
     
     <div id="message" class="message"></div>
     
     <div class="info-box">
-      ℹ️ Enter the username and password you created during account setup
+      Enter the username and password you created during account setup
     </div>
     
     <form id="loginForm" onsubmit="handleLogin(event)">
@@ -181,11 +213,12 @@
         <input type="password" id="password" name="password" placeholder="Enter password" required>
         <div class="show-password">
           <input type="checkbox" id="showPassword" onchange="togglePassword()">
-          <label for="showPassword" style="margin: 0;">Show Password</label>
+          <label for="showPassword">Show Password</label>
         </div>
       </div>
 
       <button type="submit" class="btn" id="submitBtn">Login</button>
+      <button type="button" class="btn btn-secondary" onclick="goBack()">Back to Select Interface</button>
     </form>
     
     <div class="link">
@@ -197,6 +230,10 @@
     function togglePassword() {
       const pwd = document.getElementById('password');
       pwd.type = document.getElementById('showPassword').checked ? 'text' : 'password';
+    }
+
+    function goBack() {
+      window.location.href = 'select-interface.html';
     }
     
     async function handleLogin(event) {

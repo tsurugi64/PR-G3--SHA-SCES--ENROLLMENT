@@ -193,8 +193,9 @@
             border: none;
             cursor: pointer;
             color: #00A693;
-            font-size: 1.2em;
-            padding: 5px;
+            font-size: 0.85em;
+            padding: 5px 8px;
+            font-weight: 600;
         }
 
         .toggle-password:hover {
@@ -243,7 +244,7 @@
                         minlength="6"
                         required
                     >
-                    <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')">Show</button>
                 </div>
                 <p class="small-text">At least 6 characters</p>
             </div>
@@ -259,16 +260,16 @@
                         minlength="6"
                         required
                     >
-                    <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">👁️</button>
+                    <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">Show</button>
                 </div>
             </div>
 
             <button type="submit" class="btn btn-primary" id="createBtn">
-                ✅ Create Account
+                Create Account
             </button>
 
             <button type="button" class="btn btn-secondary" onclick="goBack()">
-                ← Back to Select Interface
+                Back to Select Interface
             </button>
         </form>
 
@@ -283,7 +284,7 @@
             const adminEmail = sessionStorage.getItem('adminEmail');
             
             if (!adminEmail) {
-                showMessage('⚠️ Please verify your email first', 'error');
+                showMessage('Please verify your email first', 'error');
                 setTimeout(() => {
                     window.location.href = 'select-interface.html';
                 }, 2000);
@@ -306,22 +307,22 @@
             
             // Validate
             if (!email || !username || !password) {
-                showMessage('❌ All fields required', 'error');
+                showMessage('All fields required', 'error');
                 return;
             }
             
             if (password !== confirmPassword) {
-                showMessage('❌ Passwords do not match', 'error');
+                showMessage('Passwords do not match', 'error');
                 return;
             }
             
             if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-                showMessage('❌ Username can only contain letters, numbers, dashes, underscores', 'error');
+                showMessage('Username can only contain letters, numbers, dashes, underscores', 'error');
                 return;
             }
             
             createBtn.disabled = true;
-            createBtn.textContent = '⏳ Creating...';
+            createBtn.textContent = 'Creating...';
             
             try {
                 const response = await fetch('/api/admin/create-account', {
@@ -333,21 +334,21 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    showMessage('✅ Account created! Redirecting to login...', 'success');
+                    showMessage('Account created! Redirecting to login...', 'success');
                     sessionStorage.removeItem('adminEmail');
                     
                     setTimeout(() => {
                         window.location.href = 'admin-login.html';
                     }, 1500);
                 } else {
-                    showMessage('❌ ' + data.message, 'error');
+                    showMessage(data.message, 'error');
                     createBtn.disabled = false;
-                    createBtn.textContent = '✅ Create Account';
+                    createBtn.textContent = 'Create Account';
                 }
             } catch (error) {
-                showMessage('❌ Error: ' + error.message, 'error');
+                showMessage('Error: ' + error.message, 'error');
                 createBtn.disabled = false;
-                createBtn.textContent = '✅ Create Account';
+                createBtn.textContent = 'Create Account';
             }
         });
 
@@ -364,8 +365,10 @@
 
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
+            const button = field.parentElement.querySelector('.toggle-password');
             const isPassword = field.type === 'password';
             field.type = isPassword ? 'text' : 'password';
+            button.textContent = isPassword ? 'Hide' : 'Show';
         }
     </script>
 </body>
