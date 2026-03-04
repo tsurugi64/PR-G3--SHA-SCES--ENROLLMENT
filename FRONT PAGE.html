@@ -109,44 +109,102 @@ button:hover {
 
 .modal-content {
     background: white;
-    padding: 30px;
+    padding: 40px;
     border-radius: 20px;
-    width: 320px;
+    width: 100%;
+    max-width: 400px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
-.modal-content input {
-    width: 100%;
-    padding: 10px;
+.modal-content h2 {
+    color: #003F39;
     margin-bottom: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
+    font-size: 1.6em;
 }
 
-.login-btn {
+.modal-subtitle {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #003f39;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.form-group input {
     width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #00A693;
+    box-shadow: 0 0 8px rgba(0, 166, 147, 0.3);
+}
+
+.message {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: none;
+    font-size: 0.9em;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+
+.btn-modal {
+    width: 100%;
+    padding: 12px;
     background: #008c8c;
     color: white;
-    margin-top: 5px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+    margin-top: 10px;
 }
 
-.cancel-btn {
-    width: 100%;
-    background: #ccc;
-    color: black;
-    margin-top: 5px;
+.btn-modal:hover:not(:disabled) {
+    transform: scale(1.04);
 }
 
-.error-text {
-    color: red;
-    font-size: 14px;
+.btn-modal:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
-.countdown {
-    color: #d9534f;
-    font-size: 14px;
-    margin-bottom: 10px;
+.btn-cancel {
+    background: #e0e0e0;
+    color: #333;
 }
 
 /* SHAKE */
@@ -176,15 +234,33 @@ button:hover {
     </div>
 </div>
 
-<!-- MODAL -->
+<!-- ADMIN EMAIL VERIFICATION MODAL -->
 <div class="modal" id="adminModal">
     <div class="modal-content" id="modalBox">
         <h2>Admin Login</h2>
-        <div class="error-text" id="errorText"></div>
-        <div class="countdown" id="countdownText"></div>
-        <input type="password" id="adminPassword" placeholder="Enter Password">
-        <button class="login-btn" onclick="checkPassword()">Login</button>
-        <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        <p class="modal-subtitle">Enter authorized email to create account</p>
+        
+        <div id="message" class="message"></div>
+        
+        <form id="adminForm">
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="example@gmail.com"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn-modal" id="checkBtn">
+                Check Email
+            </button>
+            <button type="button" class="btn-modal btn-cancel" onclick="closeModal()">
+                Cancel
+            </button>
+        </form>
     </div>
 </div>
 
@@ -208,73 +284,65 @@ function goStudent() {
 }
 
 function openModal() {
-    window.location.href = "select-interface.html";
+    document.getElementById("adminModal").style.display = "flex";
+    document.getElementById("email").focus();
 }
 
 function closeModal() {
     document.getElementById("adminModal").style.display = "none";
-    document.getElementById("adminPassword").value = "";
-    document.getElementById("errorText").textContent = "";
-    document.getElementById("countdownText").textContent = "";
+    document.getElementById("adminForm").reset();
+    document.getElementById("message").style.display = "none";
 }
 
-/* LOGIN SYSTEM */
-let attempts = 0;
-const maxAttempts = 3;
-let lockTime = 0;
-let countdownInterval;
+function showMessage(text, type = 'info') {
+    const msgDiv = document.getElementById("message");
+    msgDiv.textContent = text;
+    msgDiv.className = 'message ' + type;
+}
 
-function checkPassword() {
-    const password = document.getElementById("adminPassword").value;
-    const errorText = document.getElementById("errorText");
-    const modalBox = document.getElementById("modalBox");
-
-    if (lockTime > Date.now()) return;
-
-    if (password === "SHA_ADMIN") {
-        window.location.href = "admin-login.html";
-    } else {
-        attempts++;
-        errorText.textContent = "Wrong Password! Attempts left: " + (maxAttempts - attempts);
-
-        modalBox.classList.remove("shake");
-        void modalBox.offsetWidth;
-        modalBox.classList.add("shake");
-
-        if (attempts >= maxAttempts) {
-            lockTime = Date.now() + (5 * 60 * 1000);
-            startCountdown();
+/* EMAIL VERIFICATION */
+document.getElementById('adminForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value.trim();
+    const btn = document.getElementById('checkBtn');
+    
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+    
+    try {
+        const response = await fetch('/api/admin/check-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage('✅ Email authorized! Redirecting...', 'success');
+            
+            // Store email and redirect
+            setTimeout(() => {
+                sessionStorage.setItem('adminEmail', email);
+                window.location.href = 'admin-create.html';
+            }, 1000);
+        } else {
+            showMessage('❌ ' + data.message, 'error');
+            btn.disabled = false;
+            btn.textContent = 'Check Email';
         }
+    } catch (error) {
+        showMessage('❌ Error: ' + error.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Check Email';
     }
-}
+});
 
-function startCountdown() {
-    const countdownText = document.getElementById("countdownText");
-    const loginBtn = document.querySelector(".login-btn");
-
-    loginBtn.disabled = true;
-
-    countdownInterval = setInterval(() => {
-        let remaining = lockTime - Date.now();
-
-        if (remaining <= 0) {
-            clearInterval(countdownInterval);
-            loginBtn.disabled = false;
-            attempts = 0;
-            countdownText.textContent = "";
-            return;
-        }
-
-        let minutes = Math.floor(remaining / 60000);
-        let seconds = Math.floor((remaining % 60000) / 1000);
-
-        countdownText.textContent =
-            "Locked! Try again in " +
-            String(minutes).padStart(2,'0') + ":" +
-            String(seconds).padStart(2,'0');
-
-    }, 1000);
-}
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
 </script>
 
 </body>
