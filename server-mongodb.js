@@ -16,6 +16,16 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Cache-busting middleware - prevent browser caching
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.set('Surrogate-Control', 'no-store');
+    next();
+});
+
 app.use(express.static(__dirname));
 
 // Import Models
