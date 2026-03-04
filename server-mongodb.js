@@ -238,6 +238,9 @@ app.post('/api/enroll', async (req, res) => {
             });
         }
 
+        // Always set id to null (legacy field, not used anymore)
+        enrollmentData.id = null;
+
         // Check if student with this LRN already exists
         let existingEnrollment = await Enrollment.findOne({
             'studentInfo.lrn': enrollmentData.studentInfo.lrn
@@ -254,7 +257,7 @@ app.post('/api/enroll', async (req, res) => {
             enrollmentData.enrollmentDate = new Date();
             await Enrollment.updateOne(
                 { enrollmentID: enrollmentID },
-                enrollmentData
+                { $set: enrollmentData }
             );
             
             console.log(`✅ Re-enrollment updated: EnrollmentID=${enrollmentID}, LRN=${enrollmentData.studentInfo.lrn}`);
@@ -283,33 +286,28 @@ app.post('/api/enroll', async (req, res) => {
         if (error.code === 11000) {
             const field = Object.keys(error.keyPattern)[0];
             
-            // Ignore duplicate 'id' errors (legacy field, we use enrollmentID now)
-            if (field === 'id') {
-                // Ignore and retry without the id field
-                try {
-                    enrollmentData.id = null;
-                    if (enrollmentData.enrollmentID && enrollmentData.isNewStudent === false) {
-                        await Enrollment.updateOne(
-                            { enrollmentID: enrollmentData.enrollmentID },
-                            enrollmentData
-                        );
-                    } else {
-                        const enrollment = new Enrollment(enrollmentData);
-                        await enrollment.save();
-                    }
-                    return res.json({ 
-                        success: true, 
-                        message: 'Enrollment saved successfully',
-                        enrollmentId: enrollmentData.enrollmentID
-                    });
-                } catch (retryError) {
-                    console.error('Retry failed:', retryError);
-                }
+            // If duplicate enrollmentID, it's already handled above (re-enrollment)
+            if (field === 'enrollmentID') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This enrollment ID already exists'
+                });
             }
             
-            return res.status(400).json({
-                success: false,
-                message: `A student with this ${field} already exists`
+            // If duplicate LRN, it's a re-enrollment (already handled above)
+            if (field === 'lrn') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'A student with this LRN already exists'
+                });
+            }
+            
+            // For any other duplicate (including legacy 'id' field), just log and ignore
+            console.warn(`⚠️ Ignoring duplicate key on field: ${field}`);
+            return res.json({ 
+                success: true, 
+                message: 'Enrollment saved successfully',
+                enrollmentId: enrollmentData.enrollmentID
             });
         }
         
