@@ -462,25 +462,26 @@
       e.preventDefault();
       
       const email = document.getElementById('email').value.trim();
+      console.log(`📧 [EMAIL] Form submitted. Email: ${email}`);\n      
       const btn = document.getElementById('sendCodeBtn');
       
       btn.disabled = true;
       btn.textContent = '⏳ Sending...';
       
       try {
-        const response = await fetch('/api/admin/request-code', {
+        console.log(`📡 [EMAIL] Sending POST /api/admin/request-code with email ${email}`);\n        const response = await fetch('/api/admin/request-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
         });
         
-        const data = await response.json();
+        console.log(`📡 [EMAIL] Response status: ${response.status}`);\n        const data = await response.json();
         
-        if (data.success) {
-          verificationEmail = email;
+        console.log(`📊 [EMAIL] Response data:`, data);\n        if (data.success) {
+          console.log(`✅ [EMAIL] Code request successful for ${email}`);\n          verificationEmail = email;
           document.getElementById('verifyEmailDisplay').textContent = `Code sent to ${email}`;
           
-          document.getElementById('step-1').style.display = 'none';
+          console.log(`📍 [EMAIL] Moving to step 2`);\n          document.getElementById('step-1').style.display = 'none';
           document.getElementById('step-2').style.display = 'block';
           
           showMessage('✅ Verification code sent! Check your email.', 'success');
@@ -489,11 +490,11 @@
           startResendCooldown();
           
           document.getElementById('code').focus();
-        } else {
-          showMessage('❌ ' + data.message, 'error');
+          console.log(`🔍 [EMAIL] Waiting for user to enter code...`);\n        } else {
+          console.warn(`❌ [EMAIL] Request failed: ${data.message}`);\n          showMessage('❌ ' + data.message, 'error');
         }
       } catch (error) {
-        showMessage('❌ Error: ' + error.message, 'error');
+        console.error(`❌ [ERROR] Fetch error during email send:`, error);\n        showMessage('❌ Error: ' + error.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '📧 Send Verification Code';
@@ -504,17 +505,21 @@
     document.getElementById('verifyForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const code = document.getElementById('code').value.replace(/\D/g, '');
+      const codeInput = document.getElementById('code').value;
+      console.log(`🔍 [VERIFY] Form submitted. Raw code input: "${codeInput}"`);
+      
+      const code = codeInput.replace(/\D/g, '');
+      console.log(`🔍 [VERIFY] Code after digit filtering: "${code}" (length: ${code.length})`);\n      
       const btn = document.getElementById('verifyBtn');
       
       if (code.length !== 6) {
-        showMessage('❌ Code must be 6 digits', 'error');
+        console.warn(`❌ [SECURITY] Invalid code length: ${code.length} (need 6)`);\n        showMessage('❌ Code must be 6 digits', 'error');
         return;
       }
       
       btn.disabled = true;
       btn.textContent = '⏳ Verifying...';
-      
+      console.log(`✅ [VERIFY] Sending code ${code} to /api/admin/verify-email-code for email ${verificationEmail}`);\n      
       try {
         const response = await fetch('/api/admin/verify-email-code', {
           method: 'POST',
@@ -522,25 +527,27 @@
           body: JSON.stringify({ email: verificationEmail, code })
         });
         
+        console.log(`📡 [VERIFY] Response status: ${response.status}`);\n        
         const data = await response.json();
         
+        console.log(`📊 [VERIFY] Response data:`, data);\n        
         if (data.success) {
-          showMessage('✅ Email verified! Redirecting...', 'success');
+          console.log(`✅ [VERIFY] Email verification successful for ${verificationEmail}`);\n          showMessage('✅ Email verified! Redirecting...', 'success');
           
           if (codeTimerInterval) clearInterval(codeTimerInterval);
           
           // Store verified email and redirect
           setTimeout(() => {
-            sessionStorage.setItem('verifiedAdminEmail', verificationEmail);
-            window.location.href = 'admin-create.html';
+            console.log(`📍 [REDIRECT] Setting sessionStorage.verifiedAdminEmail = "${verificationEmail}"`);\n            sessionStorage.setItem('verifiedAdminEmail', verificationEmail);
+            console.log(`📍 [REDIRECT] Navigating to admin-create.html`);\n            window.location.href = 'admin-create.html';
           }, 1500);
         } else {
-          showMessage('❌ ' + data.message, 'error');
+          console.warn(`❌ [VERIFY] Verification failed: ${data.message}`);\n          showMessage('❌ ' + data.message, 'error');
           document.getElementById('code').value = '';
           document.getElementById('code').focus();
         }
       } catch (error) {
-        showMessage('❌ Error: ' + error.message, 'error');
+        console.error(`❌ [ERROR] Fetch error during verification:`, error);\n        showMessage('❌ Error: ' + error.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '✅ Verify & Continue';

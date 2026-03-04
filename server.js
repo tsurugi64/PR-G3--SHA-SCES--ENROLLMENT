@@ -792,45 +792,78 @@ app.post('/api/admin/verify-email-code', async (req, res) => {
     try {
         const { email, code } = req.body;
         
+        // SECURITY: Comprehensive input validation
         if (!email || !code) {
+            console.warn(`🚨 SECURITY: Missing email or code in verify-email-code request. Email: ${email}, Code: ${code ? 'PROVIDED' : 'MISSING'}`);
             return res.status(400).json({ 
                 success: false, 
                 message: 'Email and code are required' 
             });
         }
         
-        // Find and verify code
-        const verificationRecord = await VerificationCode.findOne({ email });
+        // SECURITY: Validate code is exactly 6 digits
+        const codeStr = String(code).trim();
+        if (!/^\d{6}$/.test(codeStr)) {
+            console.warn(`🚨 SECURITY: Invalid code format for ${email}. Code length: ${codeStr.length}, Format: ${codeStr}`);
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Code must be 6 digits'
+            });
+        }
+        
+        // Find and verify code (case-insensitive email)
+        const verificationRecord = await VerificationCode.findOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
         
         if (!verificationRecord) {
+            console.warn(`🚨 SECURITY: No verification record found for email ${email}`);
             return res.status(400).json({ 
                 success: false, 
                 message: 'No verification code found for this email' 
             });
         }
         
-        // Check if code is expired
+        // SECURITY: Check if code is expired
         if (new Date() > verificationRecord.expiresAt) {
-            await VerificationCode.deleteOne({ email });
+            await VerificationCode.deleteOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
+            console.warn(`🚨 SECURITY: Expired code verification attempt for ${email}`);
             return res.status(400).json({ 
                 success: false, 
                 message: 'Verification code has expired' 
             });
         }
         
-        // Check if code matches
-        if (verificationRecord.code !== code) {
-            verificationRecord.attempts = (verificationRecord.attempts || 0) + 1;
+        // SECURITY: Check attempt limit
+        const attempts = (verificationRecord.attempts || 0) + 1;
+        if (attempts > 3) {
+            console.warn(`🚨 SECURITY: Too many verification attempts for ${email} (${attempts} attempts)`);
+            await VerificationCode.deleteOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
+            return res.status(429).json({ 
+                success: false, 
+                message: 'Too many failed attempts. Code reset. Please request a new code.' 
+            });
+        }
+        
+        // SECURITY: Check if code matches (strict comparison)
+        const recordCode = String(verificationRecord.code).trim();
+        const providedCode = codeStr;
+        
+        console.log(`📝 Code verification attempt for ${email}: Record has [${recordCode}], User provided [${providedCode}]`);
+        
+        if (recordCode !== providedCode) {
+            verificationRecord.attempts = attempts;
             await verificationRecord.save();
+            console.warn(`🚨 SECURITY: Invalid code for ${email}. Attempt ${attempts}/3`);
             
             return res.status(400).json({ 
                 success: false, 
-                message: 'Invalid verification code'
+                message: `Invalid verification code (${3 - attempts} attempts remaining)`
             });
         }
         
         // Code is valid! Mark as verified for account creation
+        console.log(`✅ SECURITY: Email ${email} successfully verified`);
         verificationRecord.verified = true;
+        verificationRecord.verifiedAt = new Date();
         await verificationRecord.save();
         
         res.json({ 
@@ -839,7 +872,7 @@ app.post('/api/admin/verify-email-code', async (req, res) => {
             email: email
         });
     } catch (error) {
-        console.error('Error verifying email code:', error);
+        console.error('🚨 ERROR verifying email code:', error);
         res.status(500).json({ 
             success: false, 
             message: 'Error: ' + error.message 
@@ -852,7 +885,9 @@ app.post('/api/admin/create-account', async (req, res) => {
     try {
         const { email, username, password } = req.body;
         
+        // SECURITY: Validate input
         if (!email || !username || !password) {
+            console.warn(`🚨 SECURITY: Missing required fields in create-account. Email: ${email ? 'YES' : 'NO'}, Username: ${username ? 'YES' : 'NO'}, Password: ${password ? 'YES' : 'NO'}`);
             return res.status(400).json({ 
                 success: false, 
                 message: 'Email, username, and password are required' 
@@ -860,9 +895,9 @@ app.post('/api/admin/create-account', async (req, res) => {
         }
         
         // CRITICAL: Verify email is authorized
-        const isAuthorized = approvedTeachers.some(t => t.toLowerCase() === email.toLowerCase());
+        const isAuthorized = APPROVED_TEACHERS.some(t => t.toLowerCase() === email.toLowerCase());
         if (!isAuthorized) {
-            console.warn(`🚨 SECURITY: Unauthorized email attempt to create account: ${email}`);
+            console.warn(`🚨 SECURITY ALERT: UNAUTHORIZED EMAIL ATTEMPTED TO CREATE ACCOUNT: ${email}`);
             return res.status(403).json({ 
                 success: false, 
                 message: 'This email is not authorized to create an admin account' 
@@ -870,12 +905,33 @@ app.post('/api/admin/create-account', async (req, res) => {
         }
         
         // CRITICAL: Verify email code was recently verified (prevent direct API calls)
-        const verificationRecord = await VerificationCode.findOne({ email: { $regex: email, $options: 'i' } });
-        if (!verificationRecord || verificationRecord.verified !== true) {
-            console.warn(`🚨 SECURITY: Email code not verified before account creation: ${email}`);
+        const verificationRecord = await VerificationCode.findOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
+        
+        if (!verificationRecord) {
+            console.warn(`🚨 SECURITY: No verification record exists for account creation: ${email}`);
             return res.status(403).json({ 
                 success: false, 
-                message: 'Email must be verified first' 
+                message: 'Email verification record not found' 
+            });
+        }
+        
+        if (verificationRecord.verified !== true) {
+            console.warn(`🚨 SECURITY ALERT: UNVERIFIED EMAIL TRIED TO CREATE ACCOUNT: ${email}. Verified flag: ${verificationRecord.verified}`);
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Email code must be verified first' 
+            });
+        }
+        
+        // SECURITY: Prevent verification reuse (expire after 30 minutes)
+        const verifiedAge = Date.now() - new Date(verificationRecord.verifiedAt).getTime();
+        const maxAge = 30 * 60 * 1000; // 30 minutes
+        if (verifiedAge > maxAge) {
+            console.warn(`🚨 SECURITY: Verification token expired for account creation: ${email} (${verifiedAge}ms old)`);
+            await VerificationCode.deleteOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Verification token expired. Please verify your email again.' 
             });
         }
         
