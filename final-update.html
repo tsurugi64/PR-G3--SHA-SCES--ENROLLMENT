@@ -1031,6 +1031,30 @@ function loadOldStudentData() {
             }
             
             console.log('✅ Old student data loaded successfully');
+            
+            // Re-check form validity after loading data
+            setTimeout(() => {
+                const form = document.getElementById("enrollmentForm");
+                const allInputs = form.querySelectorAll("input, select");
+                let isValid = true;
+                
+                allInputs.forEach(input => {
+                    if (input.type === "radio") {
+                        const group = form.querySelectorAll(`input[name="${input.name}"]`);
+                        const checked = [...group].some(r => r.checked);
+                        if (!checked) isValid = false;
+                    } else if (input.hasAttribute("required")) {
+                        if (!input.value || input.value.trim() === "") {
+                            isValid = false;
+                        }
+                    }
+                });
+                
+                const enrollBtn = document.getElementById('enrollBtn');
+                enrollBtn.disabled = !isValid;
+                enrollBtn.style.opacity = isValid ? "1" : "0.6";
+                enrollBtn.style.cursor = isValid ? "pointer" : "not-allowed";
+            }, 500);
         } catch (error) {
             console.error('Error loading old student data:', error);
         }
