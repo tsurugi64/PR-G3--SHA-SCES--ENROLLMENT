@@ -52,19 +52,6 @@
             font-size: 0.95em;
         }
 
-        .verified-badge {
-            background: #d4edda;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: #155724;
-            font-size: 0.9em;
-            border: 1px solid #c3e6cb;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
         .form-group {
             margin-bottom: 20px;
         }
@@ -77,7 +64,7 @@
             font-size: 0.95em;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
@@ -96,24 +83,6 @@
         input:read-only {
             background-color: #f5f5f5;
             cursor: not-allowed;
-        }
-
-        input[type="password"] {
-            font-family: 'Courier New', monospace;
-        }
-
-        .password-group {
-            position: relative;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 40px;
-            cursor: pointer;
-            color: #00A693;
-            font-size: 1.1em;
-            user-select: none;
         }
 
         .btn {
@@ -141,7 +110,6 @@
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
         }
 
         .btn-secondary {
@@ -152,7 +120,6 @@
 
         .btn-secondary:hover {
             background: #f0f8f6;
-            transform: translateY(-2px);
         }
 
         .message {
@@ -186,27 +153,25 @@
             color: #00A693;
             text-decoration: none;
             font-weight: 600;
-            transition: 0.3s;
         }
 
         .back-link a:hover {
-            color: #008f80;
+            text-decoration: underline;
+        }
+
+        .email-display {
+            background: #f0f8f6;
+            padding: 12px;
+            border-radius: 8px;
+            color: #00A693;
+            font-weight: 600;
+            margin-bottom: 15px;
         }
 
         .small-text {
             color: #666;
             font-size: 0.85em;
             margin-top: 5px;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px;
-            }
-
-            .header h1 {
-                font-size: 1.5em;
-            }
         }
     </style>
 </head>
@@ -220,20 +185,10 @@
 
         <div id="message" class="message"></div>
 
-        <div class="verified-badge">
-            ✅ Email verified
-        </div>
-
-        <form id="createAccountForm">
+        <form id="createForm">
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    readonly
-                    placeholder="verified email"
-                >
+                <label>Authorized Email:</label>
+                <div class="email-display" id="emailDisplay"></div>
             </div>
 
             <div class="form-group">
@@ -247,10 +202,10 @@
                     maxlength="20"
                     required
                 >
-                <p class="small-text">3-20 characters, letters and numbers only</p>
+                <p class="small-text">3-20 characters, letters and numbers</p>
             </div>
 
-            <div class="form-group password-group">
+            <div class="form-group">
                 <label for="password">Create Password</label>
                 <input 
                     type="password" 
@@ -260,11 +215,10 @@
                     minlength="6"
                     required
                 >
-                <span class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</span>
                 <p class="small-text">At least 6 characters</p>
             </div>
 
-            <div class="form-group password-group">
+            <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
                 <input 
                     type="password" 
@@ -274,7 +228,6 @@
                     minlength="6"
                     required
                 >
-                <span class="toggle-password" onclick="togglePasswordVisibility('confirmPassword')">👁️</span>
             </div>
 
             <button type="submit" class="btn btn-primary" id="createBtn">
@@ -282,100 +235,79 @@
             </button>
 
             <button type="button" class="btn btn-secondary" onclick="goBack()">
-                ← Back
+                ← Back to Select Interface
             </button>
         </form>
 
         <div class="back-link">
-            <a href="select-interface.html">← Change interface</a>
+            <a href="admin-login.html">Already have account? Login</a>
         </div>
     </div>
 
     <script>
-        // On page load, check for verified email in sessionStorage
+        // Check if email was verified
         window.addEventListener('DOMContentLoaded', () => {
-            const verifiedEmail = sessionStorage.getItem('verifiedAdminEmail');
+            const adminEmail = sessionStorage.getItem('adminEmail');
             
-            if (!verifiedEmail) {
-                // No verified email - redirect to verification
-                showMessage('⚠️ Email not verified. Please verify your email first.', 'error');
+            if (!adminEmail) {
+                showMessage('⚠️ Please verify your email first', 'error');
                 setTimeout(() => {
                     window.location.href = 'select-interface.html';
                 }, 2000);
                 return;
             }
             
-            // Auto-fill the verified email
-            document.getElementById('email').value = verifiedEmail;
+            document.getElementById('emailDisplay').textContent = adminEmail;
             document.getElementById('username').focus();
         });
 
-        // Toggle password visibility
-        function togglePasswordVisibility(fieldId) {
-            const field = document.getElementById(fieldId);
-            field.type = field.type === 'password' ? 'text' : 'password';
-        }
-
-        // Handle form submission
-        document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
+        // Create account
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('email').value.trim();
+            const email = sessionStorage.getItem('adminEmail');
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const createBtn = document.getElementById('createBtn');
             
-            // Validate inputs
+            // Validate
             if (!email || !username || !password) {
-                showMessage('❌ Please fill in all fields', 'error');
+                showMessage('❌ All fields required', 'error');
                 return;
             }
             
             if (password !== confirmPassword) {
                 showMessage('❌ Passwords do not match', 'error');
-                document.getElementById('confirmPassword').focus();
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage('❌ Password must be at least 6 characters', 'error');
                 return;
             }
             
             if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-                showMessage('❌ Username can only contain letters, numbers, dashes, and underscores', 'error');
+                showMessage('❌ Username can only contain letters, numbers, dashes, underscores', 'error');
                 return;
             }
             
             createBtn.disabled = true;
-            createBtn.textContent = '⏳ Creating account...';
+            createBtn.textContent = '⏳ Creating...';
             
             try {
                 const response = await fetch('/api/admin/create-account', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email,
-                        username,
-                        password
-                    })
+                    body: JSON.stringify({ email, username, password })
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
-                    showMessage('✅ Account created successfully! Redirecting to login...', 'success');
+                    showMessage('✅ Account created! Redirecting to login...', 'success');
+                    sessionStorage.removeItem('adminEmail');
                     
-                    // Clear session
-                    sessionStorage.removeItem('verifiedAdminEmail');
-                    
-                    // Redirect to login after 2 seconds
                     setTimeout(() => {
                         window.location.href = 'admin-login.html';
-                    }, 2000);
+                    }, 1500);
                 } else {
-                    showMessage('❌ ' + (data.message || 'Failed to create account'), 'error');
+                    showMessage('❌ ' + data.message, 'error');
                     createBtn.disabled = false;
                     createBtn.textContent = '✅ Create Account';
                 }
@@ -386,17 +318,14 @@
             }
         });
 
-        // Show message
-        function showMessage(message, type = 'info') {
+        function showMessage(text, type = 'info') {
             const msgDiv = document.getElementById('message');
-            msgDiv.textContent = message;
-            msgDiv.className = `message ${type}`;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            msgDiv.textContent = text;
+            msgDiv.className = 'message ' + type;
         }
 
-        // Go back
         function goBack() {
-            sessionStorage.removeItem('verifiedAdminEmail');
+            sessionStorage.removeItem('adminEmail');
             window.location.href = 'select-interface.html';
         }
     </script>

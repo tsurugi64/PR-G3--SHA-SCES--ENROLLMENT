@@ -691,252 +691,93 @@ app.post('/api/teacher/enrollments/:id/reject', (req, res) => {
     }
 });
 
-// ========== EMAIL VERIFICATION SYSTEM ==========
+// ========== SIMPLIFIED ADMIN AUTHENTICATION ==========
 
-// Step 1: Request verification code
-app.post('/api/admin/request-code', async (req, res) => {
+// Step 1: Check if email is authorized (whitelist verification)
+app.post('/api/admin/check-email', async (req, res) => {
     try {
         const { email } = req.body;
         
-        if (!email) {
+        if (!email || typeof email !== 'string') {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Email is required' 
+                message: 'Valid email is required' 
             });
         }
         
-        // Check if email is approved
+        const trimmedEmail = email.trim().toLowerCase();
+        
+        // Check if email is in approved list
         const isApproved = APPROVED_TEACHERS.some(approvedEmail => 
-            approvedEmail.toLowerCase() === email.toLowerCase()
+            approvedEmail.toLowerCase() === trimmedEmail
         );
         
         if (!isApproved) {
-            console.log(`❌ Unauthorized email attempted: ${email}`);
+            console.log(`❌ Unauthorized email attempted admin access: ${trimmedEmail}`);
             return res.status(403).json({ 
                 success: false, 
-                message: 'This email is not authorized to create an account. Please contact your administrator if you believe this is an error.' 
+                message: 'This email is not authorized. Please contact your administrator.' 
             });
         }
         
         // Check if account already exists
-        const existingAccount = await AdminAccount.findOne({ email: { $regex: email, $options: 'i' } });
-        if (existingAccount) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'An account with this email already exists. Please login or use a different email.' 
-            });
-        }
-        
-        // Generate and save verification code
-        const code = generateVerificationCode();
-        console.log(`📧 Generated verification code for ${email}: ${code}`);
-        
-        await VerificationCode.updateOne(
-            { email },
-            { email, code, expiresAt: new Date(+new Date() + 15*60000), attempts: 0 },
-            { upsert: true }
-        );
-        
-        // Send email with code
-        try {
-            await sgMail.send({
-                to: email,
-                from: 'no-reply@shacademyenrollment.edu',
-                subject: 'SHA Enrollment System - Verification Code',
-                html: `
-                    <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <div style="background: linear-gradient(135deg, #00A693, #008f80); color: white; padding: 30px; border-radius: 10px; text-align: center;">
-                            <h2 style="margin: 0; font-size: 28px;">Sacred Heart Academy</h2>
-                            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Enrollment System</p>
-                        </div>
-                        <div style="padding: 30px; background: #f9f9f9; border-bottom: 1px solid #eee;">
-                            <h3 style="color: #003F39; margin-top: 0;">Your Verification Code</h3>
-                            <p style="color: #666; font-size: 16px;">Please use the code below to verify your email and create your admin account:</p>
-                            <div style="background: white; padding: 25px; border: 3px dashed #00A693; border-radius: 8px; text-align: center; margin: 20px 0;">
-                                <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #003F39; font-family: monospace;">${code}</div>
-                            </div>
-                            <p style="color: #ff9800; font-size: 14px; font-weight: 600;">⏰ This code expires in 15 minutes</p>
-                            <p style="color: #666; font-size: 13px; margin-bottom: 0;">If you did not request this code, please ignore this email. Do not share this code with anyone.</p>
-                        </div>
-                        <div style="padding: 20px; background: #f0f0f0; text-align: center; border-radius: 0 0 10px 10px;">
-                            <p style="color: #999; font-size: 12px; margin: 0;">Sacred Heart Academy Enrollment System</p>
-                        </div>
-                    </div>
-                `
-            });
-            
-            console.log(`✅ Verification code sent to ${email}`);
-            
-            res.json({ 
-                success: true, 
-                message: 'Verification code sent to your email. Check your inbox.' 
-            });
-        } catch (emailError) {
-            console.error('SendGrid Error:', emailError);
-            res.status(500).json({ 
-                success: false, 
-                message: 'Failed to send verification code. Please try again or contact support.' 
-            });
-        }
-    } catch (error) {
-        console.error('Error requesting verification code:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Error: ' + error.message 
+        const existingAccount = await AdminAccount.findOne({ 
+            email: { $regex: `^${trimmedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } 
         });
-    }
-});
-
-// Step 2.5: Just verify the code without creating account (for admin-verify.html)
-app.post('/api/admin/verify-email-code', async (req, res) => {
-    try {
-        const { email, code } = req.body;
         
-        // SECURITY: Comprehensive input validation
-        if (!email || !code) {
-            console.warn(`🚨 SECURITY: Missing email or code in verify-email-code request. Email: ${email}, Code: ${code ? 'PROVIDED' : 'MISSING'}`);
+        if (existingAccount) {
+            console.log(`⚠️ Account already exists for authorized email: ${trimmedEmail}`);
             return res.status(400).json({ 
                 success: false, 
-                message: 'Email and code are required' 
+                message: 'Account already exists for this email. Please login instead.' 
             });
         }
         
-        // SECURITY: Validate code is exactly 6 digits
-        const codeStr = String(code).trim();
-        if (!/^\d{6}$/.test(codeStr)) {
-            console.warn(`🚨 SECURITY: Invalid code format for ${email}. Code length: ${codeStr.length}, Format: ${codeStr}`);
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Code must be 6 digits'
-            });
-        }
-        
-        // Find and verify code (case-insensitive email)
-        const verificationRecord = await VerificationCode.findOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
-        
-        if (!verificationRecord) {
-            console.warn(`🚨 SECURITY: No verification record found for email ${email}`);
-            return res.status(400).json({ 
-                success: false, 
-                message: 'No verification code found for this email' 
-            });
-        }
-        
-        // SECURITY: Check if code is expired
-        if (new Date() > verificationRecord.expiresAt) {
-            await VerificationCode.deleteOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
-            console.warn(`🚨 SECURITY: Expired code verification attempt for ${email}`);
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Verification code has expired' 
-            });
-        }
-        
-        // SECURITY: Check attempt limit
-        const attempts = (verificationRecord.attempts || 0) + 1;
-        if (attempts > 3) {
-            console.warn(`🚨 SECURITY: Too many verification attempts for ${email} (${attempts} attempts)`);
-            await VerificationCode.deleteOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
-            return res.status(429).json({ 
-                success: false, 
-                message: 'Too many failed attempts. Code reset. Please request a new code.' 
-            });
-        }
-        
-        // SECURITY: Check if code matches (strict comparison)
-        const recordCode = String(verificationRecord.code).trim();
-        const providedCode = codeStr;
-        
-        console.log(`📝 Code verification attempt for ${email}: Record has [${recordCode}], User provided [${providedCode}]`);
-        
-        if (recordCode !== providedCode) {
-            verificationRecord.attempts = attempts;
-            await verificationRecord.save();
-            console.warn(`🚨 SECURITY: Invalid code for ${email}. Attempt ${attempts}/3`);
-            
-            return res.status(400).json({ 
-                success: false, 
-                message: `Invalid verification code (${3 - attempts} attempts remaining)`
-            });
-        }
-        
-        // Code is valid! Mark as verified for account creation
-        console.log(`✅ SECURITY: Email ${email} successfully verified`);
-        verificationRecord.verified = true;
-        verificationRecord.verifiedAt = new Date();
-        await verificationRecord.save();
-        
+        console.log(`✅ Email verified as authorized: ${trimmedEmail}`);
         res.json({ 
             success: true, 
-            message: 'Email verified successfully',
-            email: email
+            message: 'Email verified. Proceed to account creation.',
+            email: trimmedEmail
         });
     } catch (error) {
-        console.error('🚨 ERROR verifying email code:', error);
+        console.error('Error checking email:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Error: ' + error.message 
+            message: 'Server error: ' + error.message 
         });
     }
 });
 
-// Create account with pre-verified email (from admin-verify.html)
+// Step 2: Create account (simplified - no verification codes needed)
 app.post('/api/admin/create-account', async (req, res) => {
     try {
         const { email, username, password } = req.body;
         
-        // SECURITY: Validate input
+        // Validate input
         if (!email || !username || !password) {
-            console.warn(`🚨 SECURITY: Missing required fields in create-account. Email: ${email ? 'YES' : 'NO'}, Username: ${username ? 'YES' : 'NO'}, Password: ${password ? 'YES' : 'NO'}`);
             return res.status(400).json({ 
                 success: false, 
                 message: 'Email, username, and password are required' 
             });
         }
         
-        // CRITICAL: Verify email is authorized
-        const isAuthorized = APPROVED_TEACHERS.some(t => t.toLowerCase() === email.toLowerCase());
+        const trimmedEmail = email.trim().toLowerCase();
+        const trimmedUsername = username.trim();
+        
+        // Verify email is authorized
+        const isAuthorized = APPROVED_TEACHERS.some(t => t.toLowerCase() === trimmedEmail);
         if (!isAuthorized) {
-            console.warn(`🚨 SECURITY ALERT: UNAUTHORIZED EMAIL ATTEMPTED TO CREATE ACCOUNT: ${email}`);
+            console.warn(`🚨 Unauthorized email attempted account creation: ${trimmedEmail}`);
             return res.status(403).json({ 
                 success: false, 
                 message: 'This email is not authorized to create an admin account' 
             });
         }
         
-        // CRITICAL: Verify email code was recently verified (prevent direct API calls)
-        const verificationRecord = await VerificationCode.findOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
-        
-        if (!verificationRecord) {
-            console.warn(`🚨 SECURITY: No verification record exists for account creation: ${email}`);
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Email verification record not found' 
-            });
-        }
-        
-        if (verificationRecord.verified !== true) {
-            console.warn(`🚨 SECURITY ALERT: UNVERIFIED EMAIL TRIED TO CREATE ACCOUNT: ${email}. Verified flag: ${verificationRecord.verified}`);
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Email code must be verified first' 
-            });
-        }
-        
-        // SECURITY: Prevent verification reuse (expire after 30 minutes)
-        const verifiedAge = Date.now() - new Date(verificationRecord.verifiedAt).getTime();
-        const maxAge = 30 * 60 * 1000; // 30 minutes
-        if (verifiedAge > maxAge) {
-            console.warn(`🚨 SECURITY: Verification token expired for account creation: ${email} (${verifiedAge}ms old)`);
-            await VerificationCode.deleteOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Verification token expired. Please verify your email again.' 
-            });
-        }
-        
         // Check if username is available
-        const existingUsername = await AdminAccount.findOne({ username: { $regex: username, $options: 'i' } });
+        const existingUsername = await AdminAccount.findOne({ 
+            username: { $regex: `^${trimmedUsername.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } 
+        });
         if (existingUsername) {
             return res.status(400).json({ 
                 success: false, 
@@ -945,7 +786,9 @@ app.post('/api/admin/create-account', async (req, res) => {
         }
         
         // Check if email already has an account
-        const existingEmail = await AdminAccount.findOne({ email: { $regex: email, $options: 'i' } });
+        const existingEmail = await AdminAccount.findOne({ 
+            email: { $regex: `^${trimmedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } 
+        });
         if (existingEmail) {
             return res.status(400).json({ 
                 success: false, 
@@ -955,18 +798,15 @@ app.post('/api/admin/create-account', async (req, res) => {
         
         // Create new account
         const newAccount = new AdminAccount({
-            email,
-            username,
+            email: trimmedEmail,
+            username: trimmedUsername,
             password, // In production, use bcrypt to hash passwords
             verified: true
         });
         
         await newAccount.save();
         
-        // Clear the verification record after successful account creation
-        await VerificationCode.deleteOne({ email: { $regex: email, $options: 'i' } });
-        
-        console.log(`✅ New admin account created: ${username} (${email})`);
+        console.log(`✅ New admin account created: ${trimmedUsername} (${trimmedEmail})`);
         
         res.json({ 
             success: true, 
@@ -979,96 +819,6 @@ app.post('/api/admin/create-account', async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating account:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Error: ' + error.message 
-        });
-    }
-});
-
-// Step 2: Verify code and create account
-app.post('/api/admin/verify-code', async (req, res) => {
-    try {
-        const { email, code, username, password } = req.body;
-        
-        if (!email || !code || !username || !password) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Email, code, username, and password are required' 
-            });
-        }
-        
-        // Check if code exists and is valid
-        const verificationRecord = await VerificationCode.findOne({ email });
-        
-        if (!verificationRecord) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'No verification code found for this email' 
-            });
-        }
-        
-        // Check if code is expired
-        if (new Date() > verificationRecord.expiresAt) {
-            await VerificationCode.deleteOne({ email });
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Verification code has expired' 
-            });
-        }
-        
-        // Check if code matches
-        if (verificationRecord.code !== code) {
-            // Increment attempts
-            verificationRecord.attempts = (verificationRecord.attempts || 0) + 1;
-            await verificationRecord.save();
-            
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid verification code',
-                attempts: verificationRecord.attempts
-            });
-        }
-        
-        // Code is correct, check if username is available
-        const existingUsername = await AdminAccount.findOne({ username });
-        if (existingUsername) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Username already taken' 
-            });
-        }
-        
-        // Check if email already has an account
-        const existingEmail = await AdminAccount.findOne({ email });
-        if (existingEmail) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'An account with this email already exists' 
-            });
-        }
-        
-        // Create new account
-        const newAccount = new AdminAccount({
-            email,
-            username,
-            password, // In production, use bcrypt to hash passwords
-            verified: true
-        });
-        
-        await newAccount.save();
-        
-        // Delete used verification code
-        await VerificationCode.deleteOne({ email });
-        
-        console.log(`✅ New admin account created: ${username} (${email})`);
-        
-        res.json({ 
-            success: true, 
-            message: 'Account created successfully! You can now login.' 
-        });
-    } catch (error) {
-        console.error('Error verifying code:', error);
         res.status(500).json({ 
             success: false, 
             message: 'Error: ' + error.message 
