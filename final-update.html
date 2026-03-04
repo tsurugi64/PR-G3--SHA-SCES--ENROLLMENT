@@ -838,7 +838,7 @@ async function submitEnrollment(event) {
             middleName: document.getElementById('middleName').value,
             lastName: document.getElementById('lastName').value,
             suffix: document.getElementById('suffix').value,
-            sex: document.getElementById('sex').value,
+            sex: document.getElementById('Gender').value,
             dateOfBirth: document.getElementById('dob').value,
             age: calculateAge(document.getElementById('dob').value),
             contactNumber: document.getElementById('contactNumber').value,
@@ -980,7 +980,7 @@ function loadOldStudentData() {
             document.getElementById('email').value = studentInfo.email || '';
             document.getElementById('contactNumber').value = studentInfo.contactNumber || '';
             document.getElementById('age').value = studentInfo.age || '';
-            document.getElementById('sex').value = studentInfo.sex || '';
+            document.getElementById('Gender').value = studentInfo.sex || '';
             document.getElementById('dateOfBirth').value = studentInfo.dateOfBirth || '';
             document.getElementById('schoolLastAttended').value = studentInfo.schoolLastAttended || '';
             document.getElementById('gwa').value = studentInfo.gwa || '';
@@ -1016,9 +1016,9 @@ function loadOldStudentData() {
             
             // Auto-fill emergency contact
             if (data.emergencyContact) {
-                document.getElementById('emergencyContactName').value = data.emergencyContact.name || '';
-                document.getElementById('emergencyContactRelationship').value = data.emergencyContact.relationship || '';
-                document.getElementById('emergencyContactNumber').value = data.emergencyContact.contactNumber || '';
+                document.getElementById('emergencyName').value = data.emergencyContact.name || '';
+                document.getElementById('emergencyRelationship').value = data.emergencyContact.relationship || '';
+                document.getElementById('emergencyContact').value = data.emergencyContact.contactNumber || '';
             }
             
             console.log('✅ Old student data loaded successfully');
