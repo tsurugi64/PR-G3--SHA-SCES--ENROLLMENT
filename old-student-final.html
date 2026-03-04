@@ -1001,33 +1001,77 @@ function loadOldStudentData() {
             const studentInfo = data.studentInfo;
             
             // Auto-fill student info
+            document.getElementById('lrn').value = studentInfo.lrn || '';
+            document.getElementById('schoolYear').value = studentInfo.schoolYear || '2025-2026'; // Set current school year
             document.getElementById('firstName').value = studentInfo.firstName || '';
             document.getElementById('middleName').value = studentInfo.middleName || '';
             document.getElementById('lastName').value = studentInfo.lastName || '';
             document.getElementById('suffix').value = studentInfo.suffix || '';
-            document.getElementById('lrn').value = studentInfo.lrn || '';
-            document.getElementById('email').value = studentInfo.email || '';
-            document.getElementById('contactNumber').value = studentInfo.contactNumber || '';
-            document.getElementById('age').value = studentInfo.age || '';
             document.getElementById('sex').value = studentInfo.sex || '';
             document.getElementById('dob').value = studentInfo.dateOfBirth || '';
+            document.getElementById('contactNumber').value = studentInfo.contactNumber || '';
+            document.getElementById('email').value = studentInfo.email || '';
             document.getElementById('schoolLastAttended').value = studentInfo.schoolLastAttended || '';
             document.getElementById('gwa').value = studentInfo.gwa || '';
-            document.getElementById('strand').value = studentInfo.strand || '';
-            document.getElementById('houseAddress').value = studentInfo.houseAddress || '';
-            document.getElementById('paymentCategory').value = studentInfo.paymentCategory || '';
-            document.getElementById('alsPasser').value = studentInfo.alsPasser || '';
+            document.getElementById('fullAddress').value = studentInfo.houseAddress || '';
+            
+            // Auto-fill payment category (radio button)
+            if (studentInfo.paymentCategory) {
+                const paymentRadios = document.querySelectorAll('input[name="paymentCategory"]');
+                paymentRadios.forEach(radio => {
+                    if (radio.value === studentInfo.paymentCategory) {
+                        radio.checked = true;
+                    }
+                });
+            }
+            
+            // Auto-fill ALS/A&E Passer (radio button)
+            if (studentInfo.alsPasser) {
+                const alsRadios = document.querySelectorAll('input[name="alsPasser"]');
+                alsRadios.forEach(radio => {
+                    if (radio.value === studentInfo.alsPasser) {
+                        radio.checked = true;
+                    }
+                });
+            }
             
             // Auto-fill parents info
             if (data.parentsInfo) {
                 document.getElementById('fatherName').value = data.parentsInfo.fatherName || '';
                 document.getElementById('fatherContact').value = data.parentsInfo.fatherContact || '';
-                document.getElementById('fatherAlumni').value = data.parentsInfo.fatherAlumni || '';
-                document.getElementById('fatherGraduatedYear').value = data.parentsInfo.fatherGraduatedYear || '';
+                
+                // Set father alumni radio button
+                if (data.parentsInfo.fatherAlumni) {
+                    const fatherAlumniRadios = document.querySelectorAll('input[name="fatherAlumni"]');
+                    fatherAlumniRadios.forEach(radio => {
+                        if (radio.value === data.parentsInfo.fatherAlumni) {
+                            radio.checked = true;
+                            toggleFatherYear(data.parentsInfo.fatherAlumni === 'yes');
+                        }
+                    });
+                    // Fill father graduated year if available
+                    if (data.parentsInfo.fatherGraduatedYear && document.getElementById('fatherYear')) {
+                        document.getElementById('fatherYear').value = data.parentsInfo.fatherGraduatedYear || '';
+                    }
+                }
+                
                 document.getElementById('motherName').value = data.parentsInfo.motherName || '';
                 document.getElementById('motherContact').value = data.parentsInfo.motherContact || '';
-                document.getElementById('motherAlumni').value = data.parentsInfo.motherAlumni || '';
-                document.getElementById('motherGraduatedYear').value = data.parentsInfo.motherGraduatedYear || '';
+                
+                // Set mother alumni radio button
+                if (data.parentsInfo.motherAlumni) {
+                    const motherAlumniRadios = document.querySelectorAll('input[name="motherAlumni"]');
+                    motherAlumniRadios.forEach(radio => {
+                        if (radio.value === data.parentsInfo.motherAlumni) {
+                            radio.checked = true;
+                            toggleMotherYear(data.parentsInfo.motherAlumni === 'yes');
+                        }
+                    });
+                    // Fill mother graduated year if available
+                    if (data.parentsInfo.motherGraduatedYear && document.getElementById('motherYear')) {
+                        document.getElementById('motherYear').value = data.parentsInfo.motherGraduatedYear || '';
+                    }
+                }
             }
             
             // Auto-fill address info
