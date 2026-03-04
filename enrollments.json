@@ -1,6 +1,7 @@
 {
   "enrollments": [
     {
+      "enrollmentID": "2026-000001",
       "studentInfo": {
         "lrn": "400969150391",
         "firstName": "David Kiann",
@@ -45,6 +46,7 @@
       "enrollmentDate": "2026-01-31T02:46:10.625Z"
     },
     {
+      "enrollmentID": "2026-000002",
       "studentInfo": {
         "lrn": "152153324335",
         "firstName": "Mar Guiller",
@@ -85,6 +87,7 @@
       "enrollmentDate": "2026-01-31T03:09:52.388Z"
     },
     {
+      "enrollmentID": "2026-000003",
       "studentInfo": {
         "lrn": "105152110100",
         "firstName": "Angel Rose",
@@ -125,6 +128,7 @@
       "enrollmentDate": "2026-02-16T07:01:56.691Z"
     },
     {
+      "enrollmentID": "2026-000004",
       "studentInfo": {
         "lrn": "102034527",
         "firstName": "Achilles Troy",
@@ -169,6 +173,7 @@
       "enrollmentDate": "2026-02-16T07:19:07.875Z"
     },
     {
+      "enrollmentID": "2026-000005",
       "studentInfo": {
         "lrn": "158531140402",
         "firstName": "DAVE",
@@ -209,6 +214,7 @@
       "enrollmentDate": "2026-02-16T07:28:36.716Z"
     },
     {
+      "enrollmentID": "2026-000006",
       "studentInfo": {
         "lrn": "111111111111",
         "firstName": "Jehlaica",
@@ -249,6 +255,7 @@
       "enrollmentDate": "2026-02-16T07:41:20.586Z"
     },
     {
+      "enrollmentID": "2026-000007",
       "studentInfo": {
         "lrn": "879899976444",
         "firstName": "Jhan Andrei",
@@ -289,6 +296,7 @@
       "enrollmentDate": "2026-02-16T07:49:24.807Z"
     },
     {
+      "enrollmentID": "2026-000008",
       "studentInfo": {
         "lrn": "400969151442",
         "firstName": "Arrold Matthieuw",
@@ -329,6 +337,7 @@
       "enrollmentDate": "2026-02-18T05:29:33.513Z"
     },
     {
+      "enrollmentID": "2026-000009",
       "studentInfo": {
         "lrn": "473287485",
         "firstName": "Coreen",
@@ -369,6 +378,7 @@
       "enrollmentDate": "2026-02-18T05:41:58.172Z"
     },
     {
+      "enrollmentID": "2026-000010",
       "studentInfo": {
         "lrn": "123456789012",
         "firstName": "Ralfh Son ",
@@ -409,6 +419,7 @@
       "enrollmentDate": "2026-02-18T05:55:49.998Z"
     },
     {
+      "enrollmentID": "2026-000011",
       "studentInfo": {
         "lrn": "41870415085",
         "firstName": "Gian",
@@ -449,6 +460,7 @@
       "enrollmentDate": "2026-02-18T06:13:49.823Z"
     },
     {
+      "enrollmentID": "2026-000012",
       "studentInfo": {
         "lrn": "112334567890",
         "firstName": "Kristel Anne ",
@@ -489,6 +501,7 @@
       "enrollmentDate": "2026-02-18T06:33:21.218Z"
     },
     {
+      "enrollmentID": "2026-000013",
       "studentInfo": {
         "lrn": "123123123123",
         "firstName": "jhared",
@@ -533,6 +546,7 @@
       "enrollmentDate": "2026-02-19T01:31:14.217Z"
     },
     {
+      "enrollmentID": "2026-000014",
       "studentInfo": {
         "lrn": "123123123123",
         "firstName": "123",
@@ -575,51 +589,6 @@
       },
       "id": 1772442115910,
       "enrollmentDate": "2026-03-02T09:01:55.910Z"
-    },
-    {
-      "enrollmentID": "2026-000007",
-      "studentInfo": {
-        "lrn": "123456789012",
-        "firstName": "jhared",
-        "middleName": "",
-        "lastName": "daguplo",
-        "suffix": "",
-        "sex": "male",
-        "dateOfBirth": "2008-01-15",
-        "age": 18,
-        "contactNumber": "09123456789",
-        "email": "jhared@example.com",
-        "schoolLastAttended": "Sacred Heart Academy",
-        "gwa": "95",
-        "strand": "stem",
-        "gradeLevel": "12",
-        "schoolYear": "26-27",
-        "houseAddress": "Test Address",
-        "paymentCategory": "Private",
-        "alsPasser": "no"
-      },
-      "parentsInfo": {
-        "fatherName": "Test Father",
-        "fatherContact": "09123456789",
-        "fatherAlumni": "no",
-        "fatherGraduatedYear": "N/A",
-        "motherName": "Test Mother",
-        "motherContact": "09123456789",
-        "motherAlumni": "no",
-        "motherGraduatedYear": "N/A"
-      },
-      "addressInfo": {
-        "province": "bulacan",
-        "city": "santa maria",
-        "barangay": "test-barangay"
-      },
-      "emergencyContact": {
-        "name": "Test Emergency",
-        "relationship": "sibling",
-        "contactNumber": "09123456789"
-      },
-      "id": 1772442115911,
-      "enrollmentDate": "2026-03-01T00:00:00.000Z"
     }
   ]
 }
