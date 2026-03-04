@@ -1,9 +1,597 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Admin Account</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Admin Account - SHA Enrollment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00A693 0%, #008f80 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            color: #003F39;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #003F39;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00A693;
+            box-shadow: 0 0 0 3px rgba(0, 166, 147, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00A693 0%, #008f80 100%);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 166, 147, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #00A693;
+            border: 2px solid #00A693;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f8f6;
+            transform: translateY(-2px);
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.95em;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        #step-1 { display: block; }
+        #step-2 { display: none; }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: #e0e0e0;
+            color: #666;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-weight: 700;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step.active .step-number {
+            background: #00A693;
+            color: white;
+        }
+
+        .step-label {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #00A693;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .back-link a:hover {
+            color: #008f80;
+        }
+
+        .timer {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .timer.warning {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .resend-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .resend-link a {
+            color: #00A693;
+            text-decoration: none;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .resend-link a:hover {
+            text-decoration: underline;
+        }
+
+        .resend-link a.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .step-indicator {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="sha_logo.png" alt="SHA Logo">
+            <h1>Create Admin Account</h1>
+            <p>Sacred Heart Academy Enrollment System</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- STEP 1: EMAIL VERIFICATION -->
+        <div id="step-1">
+            <div class="step-indicator">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Email</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Verify</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Account</div>
+                </div>
+            </div>
+
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="email">School Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="teacher@shacademysta.edu"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="sendCodeBtn">
+                    📧 Send Verification Code
+                </button>
+            </form>
+        </div>
+
+        <!-- STEP 2: CODE VERIFICATION & ACCOUNT CREATION -->
+        <div id="step-2">
+            <div class="step-indicator">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Email</div>
+                </div>
+                <div class="step active">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Verify</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Account</div>
+                </div>
+            </div>
+
+            <form id="verifyForm">
+                <div class="form-group">
+                    <label for="verifyEmail">Email</label>
+                    <input 
+                        type="email" 
+                        id="verifyEmail" 
+                        readonly
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="code">Verification Code</label>
+                    <input 
+                        type="text" 
+                        id="code" 
+                        name="code" 
+                        placeholder="000000"
+                        maxlength="6"
+                        inputmode="numeric"
+                        required
+                    >
+                </div>
+
+                <div class="timer" id="timer">
+                    Code expires in: <span id="timerCount">15:00</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Create Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="your_username"
+                        minlength="3"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Create Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Strong password"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="verifyBtn">
+                    ✅ Verify & Create Account
+                </button>
+
+                <button type="button" class="btn btn-secondary" onclick="goBackToEmail()">
+                    ← Back
+                </button>
+
+                <div class="resend-link">
+                    <a id="resendLink" class="disabled">Resend Code in <span id="resendTimer">60</span>s</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="back-link">
+            <a href="admin-login.html">← Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        let verificationEmail = '';
+        let resendCooldown = 0;
+        let codeTimerInterval = null;
+        let codeExpireTime = null;
+
+        // Show message
+        function showMessage(message, type = 'info') {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = message;
+            msgDiv.className = `message ${type}`;
+            if (type !== 'info') {
+                msgDiv.style.display = 'block';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Step 1: Send verification code
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const btn = document.getElementById('sendCodeBtn');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+            
+            try {
+                const response = await fetch('/api/admin/request-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    verificationEmail = email;
+                    document.getElementById('verifyEmail').value = email;
+                    
+                    // Show step 2
+                    document.getElementById('step-1').style.display = 'none';
+                    document.getElementById('step-2').style.display = 'block';
+                    
+                    showMessage('✅ Verification code sent! Check your email.', 'success');
+                    
+                    // Start timers
+                    startCodeTimer();
+                    startResendCooldown();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📧 Send Verification Code';
+            }
+        });
+
+        // Step 2: Verify code and create account
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('code').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('verifyBtn');
+            
+            if (code.length !== 6) {
+                showMessage('Verification code must be 6 digits', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating account...';
+            
+            try {
+                const response = await fetch('/api/admin/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: verificationEmail,
+                        code,
+                        username,
+                        password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('✅ Account created successfully! Redirecting to login...', 'success');
+                    
+                    // Clear form
+                    document.getElementById('verifyForm').reset();
+                    document.getElementById('emailForm').reset();
+                    
+                    // Redirect to login after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'admin-login.html';
+                    }, 2000);
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✅ Verify & Create Account';
+            }
+        });
+
+        // Code timer (15 minutes)
+        function startCodeTimer() {
+            codeExpireTime = Date.now() + (15 * 60 * 1000);
+            codeTimerInterval = setInterval(() => {
+                const remaining = Math.max(0, codeExpireTime - Date.now());
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                const timerDisplay = document.getElementById('timerCount');
+                timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                const timerEl = document.getElementById('timer');
+                if (remaining < 300000) { // 5 minutes
+                    timerEl.classList.add('warning');
+                }
+                
+                if (remaining === 0) {
+                    clearInterval(codeTimerInterval);
+                    document.getElementById('code').disabled = true;
+                    showMessage('Verification code expired. Please request a new one.', 'error');
+                    goBackToEmail();
+                }
+            }, 1000);
+        }
+
+        // Resend cooldown (60 seconds)
+        function startResendCooldown() {
+            resendCooldown = 60;
+            const resendLink = document.getElementById('resendLink');
+            resendLink.classList.add('disabled');
+            
+            const interval = setInterval(() => {
+                resendCooldown--;
+                document.getElementById('resendTimer').textContent = resendCooldown;
+                
+                if (resendCooldown === 0) {
+                    clearInterval(interval);
+                    resendLink.classList.remove('disabled');
+                    resendLink.onclick = resendCode;
+                }
+            }, 1000);
+        }
+
+        // Resend verification code
+        async function resendCode() {
+            if (resendCooldown > 0) return;
+            
+            const email = verificationEmail;
+            const resendLink = document.getElementById('resendLink');
+            resendLink.textContent = '⏳ Sending...';
+            
+            try {
+                const response = await fetch('/api/admin/request-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('✅ New code sent to your email!', 'success');
+                    
+                    // Reset timers
+                    if (codeTimerInterval) clearInterval(codeTimerInterval);
+                    document.getElementById('timer').classList.remove('warning');
+                    document.getElementById('code').disabled = false;
+                    document.getElementById('code').value = '';
+                    
+                    startCodeTimer();
+                    startResendCooldown();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            } finally {
+                resendLink.textContent = 'Resend Code in 60s';
+            }
+        }
+
+        // Go back to email step
+        function goBackToEmail() {
+            if (codeTimerInterval) clearInterval(codeTimerInterval);
+            document.getElementById('step-1').style.display = 'block';
+            document.getElementById('step-2').style.display = 'none';
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('verifyForm').reset();
+            verificationEmail = '';
+        }
+    </script>
+</body>
+</html>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {

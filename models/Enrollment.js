@@ -6,6 +6,15 @@ const enrollmentSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    enrollmentID: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    isNewStudent: {
+        type: Boolean,
+        default: true
+    },
     enrollmentDate: {
         type: Date,
         default: Date.now

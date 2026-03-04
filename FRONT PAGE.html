@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRONT PAGE</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* BACKGROUND */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+        linear-gradient(rgba(0, 180, 180, 0.9), rgba(0, 140, 140, 0.9)),
+        url("sha_logo.png");
+    background-size: cover;
+    background-position: center;
+}
+
+/* BUBBLES */
+.bubbles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    animation: rise linear infinite;
+}
+
+@keyframes rise {
+    from { transform: translateY(0); opacity: 0.8; }
+    to { transform: translateY(-120vh); opacity: 0; }
+}
+
+/* MAIN BOX */
+.container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 50px;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+h1 {
+    color: #008c8c;
+    margin-bottom: 30px;
+}
+
+.button-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+button {
+    padding: 15px 35px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    transition: 0.3s;
+}
+
+.student-btn { background: #00b4b4; }
+.admin-btn { background: #008c8c; }
+
+button:hover {
+    transform: translateY(-4px);
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.login-btn {
+    width: 100%;
+    background: #008c8c;
+    color: white;
+    margin-top: 5px;
+}
+
+.cancel-btn {
+    width: 100%;
+    background: #ccc;
+    color: black;
+    margin-top: 5px;
+}
+
+.error-text {
+    color: red;
+    font-size: 14px;
+}
+
+.countdown {
+    color: #d9534f;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* SHAKE */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+.shake {
+    animation: shake 0.3s;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bubbles" id="bubbles"></div>
+
+<div class="container">
+    <h1>Select Interface</h1>
+    <div class="button-group">
+        <button class="student-btn" onclick="goStudent()">Student Interface</button>
+        <button class="admin-btn" onclick="openModal()">Admin Interface</button>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="adminModal">
+    <div class="modal-content" id="modalBox">
+        <h2>Admin Login</h2>
+        <div class="error-text" id="errorText"></div>
+        <div class="countdown" id="countdownText"></div>
+        <input type="password" id="adminPassword" placeholder="Enter Password">
+        <button class="login-btn" onclick="checkPassword()">Login</button>
+        <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+
+<script>
+/* BUBBLES */
+const container = document.getElementById("bubbles");
+
+for (let i = 0; i < 50; i++) {
+    let bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.style.left = Math.random() * 100 + "vw";
+    bubble.style.width = (10 + Math.random() * 40) + "px";
+    bubble.style.height = bubble.style.width;
+    bubble.style.animationDuration = (6 + Math.random() * 10) + "s";
+    container.appendChild(bubble);
+}
+
+/* NAVIGATION */
+function goStudent() {
+    window.location.href = "home-for-student.html";
+}
+
+function openModal() {
+    window.location.href = "admin-create.html";
+}
+
+function closeModal() {
+    document.getElementById("adminModal").style.display = "none";
+    document.getElementById("adminPassword").value = "";
+    document.getElementById("errorText").textContent = "";
+    document.getElementById("countdownText").textContent = "";
+}
+
+/* LOGIN SYSTEM */
+let attempts = 0;
+const maxAttempts = 3;
+let lockTime = 0;
+let countdownInterval;
+
+function checkPassword() {
+    const password = document.getElementById("adminPassword").value;
+    const errorText = document.getElementById("errorText");
+    const modalBox = document.getElementById("modalBox");
+
+    if (lockTime > Date.now()) return;
+
+    if (password === "SHA_ADMIN") {
+        window.location.href = "admin-login.html";
+    } else {
+        attempts++;
+        errorText.textContent = "Wrong Password! Attempts left: " + (maxAttempts - attempts);
+
+        modalBox.classList.remove("shake");
+        void modalBox.offsetWidth;
+        modalBox.classList.add("shake");
+
+        if (attempts >= maxAttempts) {
+            lockTime = Date.now() + (5 * 60 * 1000);
+            startCountdown();
+        }
+    }
+}
+
+function startCountdown() {
+    const countdownText = document.getElementById("countdownText");
+    const loginBtn = document.querySelector(".login-btn");
+
+    loginBtn.disabled = true;
+
+    countdownInterval = setInterval(() => {
+        let remaining = lockTime - Date.now();
+
+        if (remaining <= 0) {
+            clearInterval(countdownInterval);
+            loginBtn.disabled = false;
+            attempts = 0;
+            countdownText.textContent = "";
+            return;
+        }
+
+        let minutes = Math.floor(remaining / 60000);
+        let seconds = Math.floor((remaining % 60000) / 1000);
+
+        countdownText.textContent =
+            "Locked! Try again in " +
+            String(minutes).padStart(2,'0') + ":" +
+            String(seconds).padStart(2,'0');
+
+    }, 1000);
+}
+</script>
+
+</body>
+</html>

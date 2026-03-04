@@ -920,8 +920,15 @@ async function submitEnrollment() {
             studentInfo,
             parentsInfo,
             addressInfo,
-            emergencyContact
+            emergencyContact,
+            isNewStudent: studentType !== 'old'
         };
+        
+        // If old student, include the enrollment ID
+        const enrollmentID = sessionStorage.getItem('enrollmentID');
+        if (enrollmentID) {
+            enrollmentData.enrollmentID = enrollmentID;
+        }
 
         // Show loading
         const button = event.target;
@@ -986,8 +993,76 @@ function toggleDarkMode(){
     btn.innerHTML=document.body.classList.contains("dark")?"☀ Light Mode":"🌙 Dark Mode"; 
 }
 
+// Load old student data if available
+function loadOldStudentData() {
+    const oldStudentDataStr = sessionStorage.getItem('oldStudentData');
+    if (oldStudentDataStr) {
+        try {
+            const data = JSON.parse(oldStudentDataStr);
+            const studentInfo = data.studentInfo;
+            
+            // Auto-fill student info
+            document.getElementById('firstName').value = studentInfo.firstName || '';
+            document.getElementById('middleName').value = studentInfo.middleName || '';
+            document.getElementById('lastName').value = studentInfo.lastName || '';
+            document.getElementById('suffix').value = studentInfo.suffix || '';
+            document.getElementById('lrn').value = studentInfo.lrn || '';
+            document.getElementById('email').value = studentInfo.email || '';
+            document.getElementById('contactNumber').value = studentInfo.contactNumber || '';
+            document.getElementById('age').value = studentInfo.age || '';
+            document.getElementById('sex').value = studentInfo.sex || '';
+            document.getElementById('dateOfBirth').value = studentInfo.dateOfBirth || '';
+            document.getElementById('schoolLastAttended').value = studentInfo.schoolLastAttended || '';
+            document.getElementById('gwa').value = studentInfo.gwa || '';
+            document.getElementById('strand').value = studentInfo.strand || '';
+            document.getElementById('houseAddress').value = studentInfo.houseAddress || '';
+            document.getElementById('paymentCategory').value = studentInfo.paymentCategory || '';
+            document.getElementById('alsPasser').value = studentInfo.alsPasser || '';
+            
+            // Auto-fill parents info
+            if (data.parentsInfo) {
+                document.getElementById('fatherName').value = data.parentsInfo.fatherName || '';
+                document.getElementById('fatherContact').value = data.parentsInfo.fatherContact || '';
+                document.getElementById('fatherAlumni').value = data.parentsInfo.fatherAlumni || '';
+                document.getElementById('fatherGraduatedYear').value = data.parentsInfo.fatherGraduatedYear || '';
+                document.getElementById('motherName').value = data.parentsInfo.motherName || '';
+                document.getElementById('motherContact').value = data.parentsInfo.motherContact || '';
+                document.getElementById('motherAlumni').value = data.parentsInfo.motherAlumni || '';
+                document.getElementById('motherGraduatedYear').value = data.parentsInfo.motherGraduatedYear || '';
+            }
+            
+            // Auto-fill address info
+            if (data.addressInfo) {
+                document.getElementById('province').value = data.addressInfo.province ? data.addressInfo.province.toLowerCase().replace(/ /g, '-') : '';
+                updateCities();
+                setTimeout(() => {
+                    document.getElementById('city').value = data.addressInfo.city || '';
+                    updateBarangays();
+                    setTimeout(() => {
+                        document.getElementById('barangay').value = data.addressInfo.barangay || '';
+                    }, 100);
+                }, 100);
+            }
+            
+            // Auto-fill emergency contact
+            if (data.emergencyContact) {
+                document.getElementById('emergencyContactName').value = data.emergencyContact.name || '';
+                document.getElementById('emergencyContactRelationship').value = data.emergencyContact.relationship || '';
+                document.getElementById('emergencyContactNumber').value = data.emergencyContact.contactNumber || '';
+            }
+            
+            console.log('✅ Old student data loaded successfully');
+        } catch (error) {
+            console.error('Error loading old student data:', error);
+        }
+    }
+}
+
 // Initialize provinces on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Load old student data if available
+    loadOldStudentData();
+    
     // Toggle asterisk visibility based on input values
     const inputs = document.querySelectorAll('input[required], select[required]');
     inputs.forEach(input => {
@@ -1208,7 +1283,17 @@ function showCelebration(enrollmentId, gradeLevel, studentType) {
 }
 
 function goToHome() {
-    window.location.href = 'Home.html';
+    // Check user type from localStorage
+    const userType = localStorage.getItem('userType') || 'student';
+    
+    if (userType === 'teacher') {
+        window.location.href = 'Home.html';
+    } else {
+        window.location.href = 'home-for-student.html';
+    }
+    
+    // Clear user type after redirect
+    localStorage.removeItem('userType');
 }
 
 function createConfetti() {

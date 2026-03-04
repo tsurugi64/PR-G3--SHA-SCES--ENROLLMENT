@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sacred Heart Academy of Sta. Maria</title>
+    <title>SHA Teacher - Enrollment Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         * {
@@ -15,20 +16,20 @@
         html, body {
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
         }
 
-        /* ===== BACK BUTTON ===== */
-        .back-btn {
-            position: absolute;
-            top: 25px;
-            left: 35px;
-            z-index: 10;
+        /* ===== ADMIN LOGIN BUTTON (TOP RIGHT) ===== */
+        .admin-login-btn {
+            position: fixed;
+            top: 20px;
+            right: 25px;
+            z-index: 100;
             background: rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(6px);
             color: white;
-            padding: 10px 22px;
+            padding: 12px 25px;
             border-radius: 20px;
             font-size: 0.95rem;
             font-weight: bold;
@@ -37,63 +38,65 @@
             border: 1px solid rgba(255,255,255,0.35);
         }
 
-        .back-btn:hover {
-            background: #00A693;
-            transform: translateY(-2px);
-        }
-
-        /* ===== LOGIN BUTTON ===== */
-        .login-btn-top {
-            position: absolute;
-            top: 25px;
-            right: 35px;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(6px);
-            color: white;
-            padding: 10px 22px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            text-decoration: none;
-            transition: 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.35);
-        }
-
-        .login-btn-top:hover {
+        .admin-login-btn:hover {
             background: #FF6B6B;
             transform: translateY(-2px);
         }
 
-        /* ===== SIDEBAR ===== */
+        /* ===== SIDEBAR/NAV ===== */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 220px;
+            width: 260px;
             height: 100%;
             background: linear-gradient(180deg, #00A693 0%, #008f80 100%);
             color: white;
-            padding: 20px 0;
+            padding: 30px 0 20px 0;
             overflow-y: auto;
             z-index: 100;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 101;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.35);
+            transition: 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: #00A693;
         }
 
         .logo-section {
             text-align: center;
-            padding: 20px;
+            padding: 0 20px 30px 20px;
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         .logo-section img {
-            width: 80px;
+            width: 70px;
             margin-bottom: 10px;
             border-radius: 8px;
         }
 
         .logo-section h1 {
-            font-size: 1.1em;
+            font-size: 1.15em;
             font-weight: 700;
             margin-bottom: 5px;
         }
@@ -135,213 +138,343 @@
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
-            margin-left: 220px;
-            width: calc(100% - 220px);
+            margin-left: 260px;
+            width: calc(100% - 260px);
             height: 100%;
-            overflow: auto;
-            position: relative;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f5f5f5;
+            transition: margin-left 0.3s ease;
         }
 
-        /* ===== HERO SECTION ===== */
-        .hero {
-            height: 100%;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .hero video {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .main-content.expanded {
+            margin-left: 0;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2;
+        /* ===== DASHBOARD CONTAINER ===== */
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 3;
-            max-width: 800px;
-            animation: slideUp 0.8s ease-out;
-        }
-
-        .hero-content h1 {
-            font-size: 3.5em;
-            color: #003F39;
-            margin-bottom: 20px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .hero-content p {
-            font-size: 1.3em;
-            color: #00695F;
+        .dashboard-header {
             margin-bottom: 40px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5em;
+            color: #003F39;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.95em;
+            margin-bottom: 10px;
             font-weight: 500;
         }
 
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #00A693 0%, #008f80 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 166, 147, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
             color: #00A693;
-            border: 2px solid #00A693;
+            margin-bottom: 15px;
         }
 
-        .btn-secondary:hover {
-            background: #F0F8F6;
-            transform: translateY(-3px);
+        .stat-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* ===== CHART SECTION ===== */
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .chart-title {
+            font-size: 1.4em;
+            color: #003F39;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .chart-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            color: #666;
+            font-size: 0.95em;
+            text-align: center;
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .sidebar {
-                width: 180px;
-            }
-
-            .main-content {
-                margin-left: 180px;
-                width: calc(100% - 180px);
-            }
-
-            .hero-content h1 {
-                font-size: 2.2em;
-            }
-
-            .hero-content p {
-                font-size: 1em;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .btn {
                 width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .sidebar {
-                width: 0;
-                display: none;
             }
 
             .main-content {
                 margin-left: 0;
                 width: 100%;
+                padding: 20px;
             }
 
-            .back-btn, .login-btn-top {
-                padding: 8px 15px;
-                font-size: 0.85rem;
-            }
-
-            .hero-content h1 {
+            .dashboard-header h1 {
                 font-size: 1.8em;
             }
 
-            .hero-content p {
-                font-size: 0.9em;
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 300px;
             }
         }
 
         /* ===== ANIMATIONS ===== */
-        @keyframes slideUp {
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
+
+        .dashboard {
+            animation: fadeIn 0.5s ease-out;
+        }
     </style>
-</head>
 <body>
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <!-- SIDEBAR WITH COLLAPSIBLE NAV -->
+    <div class="sidebar" id="sidebar">
         <div class="logo-section">
             <img src="sha_logo.png" alt="SHA Logo" />
             <h1>Sacred Heart</h1>
             <p>Academy</p>
         </div>
         <ul class="nav-menu">
-            <li><a href="index.html" class="active">Home</a></li>
-            <li><a href="enrollment-records.html">Enrollment Records</a></li>
+            <li><a href="#" class="active">📊 Home</a></li>
             <li><a href="admin-login.html">🔒 Admin</a></li>
         </ul>
-    </aside>
+    </div>
+
+    <!-- TOGGLE BUTTON -->
+    <div class="sidebar-toggle" id="sidebarToggle">→</div>
+
+    <!-- ADMIN LOGIN BUTTON -->
+    <a href="admin-login.html" class="admin-login-btn">🔒 Admin Login</a>
 
     <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <!-- BUTTONS -->
-        <a href="index.html" class="back-btn">← Back</a>
-        <a href="admin-login.html" class="login-btn-top">🔒 Admin Login</a>
+    <div class="main-content" id="mainContent">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <h1>📊 Welcome to SHA Enrollment Dashboard</h1>
+                <p>Real-time enrollment tracking and analytics</p>
+            </div>
 
-        <!-- HERO SECTION -->
-        <section class="hero">
-            <video autoplay muted loop playsinline>
-                <source src="WELCOME BACK, BATCH 2026!.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            <div class="hero-content">
-                <h1>Welcome to SHA Enrollment</h1>
-                <p>Sacred Heart Academy of Sta. Maria - Your Gateway to Excellence</p>
-                <div class="cta-buttons">
-                    <a href="final.html" class="btn btn-primary">📝 Enroll Now</a>
-                    <a href="enrollment-records.html" class="btn btn-secondary">📋 View Records</a>
+            <!-- STATS CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Enrollments</div>
+                    <div class="stat-value" id="totalEnrollments">0</div>
+                    <div class="stat-description">Students enrolled this season</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Today's Enrollments</div>
+                    <div class="stat-value" id="todayEnrollments">0</div>
+                    <div class="stat-description">Enrollments completed today</div>
                 </div>
             </div>
-        </section>
+
+            <!-- DAILY ENROLLMENT CHART -->
+            <div class="chart-section">
+                <h2 class="chart-title">📈 Daily Enrollments Trend</h2>
+                <div class="chart-container">
+                    <canvas id="dailyEnrollmentChart"></canvas>
+                </div>
+                <div class="chart-info" id="chartInfo">
+                    Hover over bars to see daily enrollment counts
+                </div>
+            </div>
+
+            <!-- ENROLL STUDENT BUTTON -->
+            <div style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
+                <a href="verification.html" id="enrollTeacherBtn" style="display: inline-block; background: linear-gradient(135deg, #00A693 0%, #008f80 100%); color: white; padding: 15px 40px; border-radius: 30px; font-size: 1.1em; font-weight: 600; text-decoration: none; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); transition: 0.3s; border: none; cursor: pointer;">➕ Enroll New Student</a>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        let sidebarOpen = true;
+
+        // Sidebar toggle functionality
+        toggleBtn.addEventListener('click', () => {
+            sidebarOpen = !sidebarOpen;
+            if (sidebarOpen) {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('expanded');
+                toggleBtn.textContent = '←';
+            } else {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+                toggleBtn.textContent = '→';
+            }
+        });
+
+        // Fetch and display analytics
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/analytics');
+                const data = await response.json();
+                
+                document.getElementById('totalEnrollments').textContent = data.totalEnrollments;
+                document.getElementById('todayEnrollments').textContent = data.todayEnrollments;
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // Fetch and display daily enrollment chart
+        let dailyChart = null;
+
+        async function loadDailyChart() {
+            try {
+                const response = await fetch('/api/analytics/daily');
+                const data = await response.json();
+
+                const ctx = document.getElementById('dailyEnrollmentChart').getContext('2d');
+                
+                if (dailyChart) {
+                    dailyChart.destroy();
+                }
+
+                dailyChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.displayDate),
+                        datasets: [{
+                            label: 'Enrollments',
+                            data: data.map(d => d.count),
+                            backgroundColor: '#00A693',
+                            borderColor: '#008f80',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    font: { size: 12, weight: 'bold' },
+                                    color: '#333'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.parsed.y + ' students enrolled';
+                                    }
+                                },
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: { size: 11 },
+                                    color: '#666'
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 11 },
+                                    color: '#666'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading daily chart:', error);
+                document.getElementById('chartInfo').textContent = 'Could not load chart data';
+            }
+        }
+
+        // Handle teacher enrollment
+        document.getElementById('enrollTeacherBtn').addEventListener('click', (e) => {
+            localStorage.setItem('userType', 'teacher');
+        });
+
+        // Load data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAnalytics();
+            loadDailyChart();
+
+            // Refresh data every 30 seconds
+            setInterval(() => {
+                loadAnalytics();
+                loadDailyChart();
+            }, 30000);
+        });
+    </script>
 </body>
 </html>
