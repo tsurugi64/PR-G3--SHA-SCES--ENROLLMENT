@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Interface - SHA Enrollment System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #00A693 0%, #008f80 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .main-container {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .interface-card {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .interface-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .interface-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+
+    .interface-card h2 {
+      color: #003F39;
+      font-size: 1.8em;
+      margin-bottom: 15px;
+    }
+
+    .interface-card p {
+      color: #666;
+      font-size: 0.95em;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .btn-interface {
+      background: linear-gradient(145deg, #00b4a4, #008f80);
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.25s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-interface:hover {
+      transform: scale(1.05);
+    }
+
+    .divider {
+      width: 1px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.3);
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .divider {
+        display: block;
+      }
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: linear-gradient(145deg, #ffffff, #e8f8f5);
+      margin: auto;
+      padding: 40px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 420px;
+      top: 50%;
+      left: 50%;
+      position: relative;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal h2 {
+      color: #00A693;
+      margin-bottom: 10px;
+      font-size: 1.6em;
+    }
+
+    .modal-subtitle {
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 0.9em;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #003f39;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #b5d8d2;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #ffffff, #eefaf7);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1em;
+      transition: 0.25s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #00A693;
+      box-shadow: 0 0 8px rgba(0, 166, 147, 0.35);
+      background: #ffffff;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+      font-size: 0.9em;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+
+    .message.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+      display: block;
+    }
+
+    .timer {
+      text-align: center;
+      color: #00A693;
+      font-size: 0.9em;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .timer.warning {
+      color: #ff9800;
+    }
+
+    .btn-modal {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(145deg, #00b4a4, #008f80);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.25s;
+      margin-top: 10px;
+    }
+
+    .btn-modal:hover:not(:disabled) {
+      transform: scale(1.04);
+    }
+
+    .btn-modal:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-close {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+    }
+
+    .step-number {
+      width: 35px;
+      height: 35px;
+      background: #e0f2f1;
+      color: #00A693;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin: 0 auto 5px;
+      font-size: 0.85em;
+    }
+
+    .step.active .step-number {
+      background: #00A693;
+      color: white;
+    }
+
+    .step-label {
+      font-size: 0.75em;
+      color: #999;
+    }
+
+    .step.active .step-label {
+      color: #00A693;
+      font-weight: 600;
+    }
+
+    .resend-info {
+      text-align: center;
+      font-size: 0.85em;
+      color: #666;
+      margin-top: 12px;
+    }
+
+    .resend-info a {
+      color: #00A693;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .resend-info a.disabled {
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    #step-1 { display: block; }
+    #step-2 { display: none; }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- Student Interface -->
+    <div class="interface-card">
+      <div class="interface-icon">👨‍🎓</div>
+      <h2>Student Interface</h2>
+      <p>Enroll yourself and manage your enrollment information</p>
+      <a href="FRONT PAGE.html" class="btn-interface">
+        Start Enrollment
+      </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Admin Interface -->
+    <div class="interface-card">
+      <div class="interface-icon">🔐</div>
+      <h2>Admin Interface</h2>
+      <p>Access the administrative dashboard to manage enrollments</p>
+      <button class="btn-interface" onclick="openAdminVerification()">
+        Admin Access
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Verification Modal -->
+  <div id="adminModal" class="modal" onclick="closeAdminModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div id="message" class="message"></div>
+
+      <!-- Step 1: Email Verification -->
+      <div id="step-1">
+        <div class="step-indicator">
+          <div class="step active">
+            <div class="step-number">1</div>
+            <div class="step-label">Email</div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-label">Verify</div>
+          </div>
+        </div>
+
+        <h2>Email Verification</h2>
+        <p class="modal-subtitle">Verify your email to access the admin panel</p>
+
+        <form id="emailForm">
+          <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="your_email@gmail.com"
+              required
+            >
+          </div>
+
+          <button type="submit" class="btn-modal" id="sendCodeBtn">
+            📧 Send Verification Code
+          </button>
+
+          <button type="button" class="btn-modal btn-close" onclick="closeAdminModal()">
+            ← Back
+          </button>
+        </form>
+      </div>
+
+      <!-- Step 2: Code Verification -->
+      <div id="step-2">
+        <div class="step-indicator">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-label">Email</div>
+          </div>
+          <div class="step active">
+            <div class="step-number">2</div>
+            <div class="step-label">Verify</div>
+          </div>
+        </div>
+
+        <h2>Verify Code</h2>
+        <p class="modal-subtitle" id="verifyEmailDisplay"></p>
+
+        <form id="verifyForm">
+          <div class="timer" id="timer">
+            ⏰ Code expires in: <span id="timerCount">15:00</span>
+          </div>
+
+          <div class="form-group">
+            <label for="code">Enter Verification Code:</label>
+            <input 
+              type="text" 
+              id="code" 
+              name="code" 
+              placeholder="000000"
+              maxlength="6"
+              inputmode="numeric"
+              pattern="[0-9]{6}"
+              required
+            >
+          </div>
+
+          <button type="submit" class="btn-modal" id="verifyBtn">
+            ✅ Verify & Continue
+          </button>
+
+          <button type="button" class="btn-modal btn-close" onclick="goBackToEmail()">
+            ← Back
+          </button>
+
+          <div class="resend-info">
+            <a id="resendLink" class="disabled">Resend Code in <span id="resendTimer">60</span>s</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let verificationEmail = '';
+    let resendCooldown = 0;
+    let codeTimerInterval = null;
+    let codeExpireTime = null;
+
+    function openAdminVerification() {
+      document.getElementById('adminModal').style.display = 'block';
+      document.getElementById('email').focus();
+    }
+
+    function closeAdminModal(event) {
+      if (event && event.target !== document.getElementById('adminModal')) return;
+      document.getElementById('adminModal').style.display = 'none';
+      resetModal();
+    }
+
+    function resetModal() {
+      document.getElementById('step-1').style.display = 'block';
+      document.getElementById('step-2').style.display = 'none';
+      document.getElementById('message').style.display = 'none';
+      document.getElementById('emailForm').reset();
+      document.getElementById('verifyForm').reset();
+      verificationEmail = '';
+      if (codeTimerInterval) clearInterval(codeTimerInterval);
+    }
+
+    function showMessage(text, type = 'info') {
+      const msgDiv = document.getElementById('message');
+      msgDiv.textContent = text;
+      msgDiv.className = `message ${type}`;
+    }
+
+    // Step 1: Send verification code
+    document.getElementById('emailForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      const btn = document.getElementById('sendCodeBtn');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Sending...';
+      
+      try {
+        const response = await fetch('/api/admin/request-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          verificationEmail = email;
+          document.getElementById('verifyEmailDisplay').textContent = `Code sent to ${email}`;
+          
+          document.getElementById('step-1').style.display = 'none';
+          document.getElementById('step-2').style.display = 'block';
+          
+          showMessage('✅ Verification code sent! Check your email.', 'success');
+          
+          startCodeTimer();
+          startResendCooldown();
+          
+          document.getElementById('code').focus();
+        } else {
+          showMessage('❌ ' + data.message, 'error');
+        }
+      } catch (error) {
+        showMessage('❌ Error: ' + error.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📧 Send Verification Code';
+      }
+    });
+
+    // Step 2: Verify code
+    document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const code = document.getElementById('code').value.replace(/\D/g, '');
+      const btn = document.getElementById('verifyBtn');
+      
+      if (code.length !== 6) {
+        showMessage('❌ Code must be 6 digits', 'error');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Verifying...';
+      
+      try {
+        const response = await fetch('/api/admin/verify-email-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: verificationEmail, code })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showMessage('✅ Email verified! Redirecting...', 'success');
+          
+          if (codeTimerInterval) clearInterval(codeTimerInterval);
+          
+          // Store verified email and redirect
+          setTimeout(() => {
+            sessionStorage.setItem('verifiedAdminEmail', verificationEmail);
+            window.location.href = 'admin-create.html';
+          }, 1500);
+        } else {
+          showMessage('❌ ' + data.message, 'error');
+          document.getElementById('code').value = '';
+          document.getElementById('code').focus();
+        }
+      } catch (error) {
+        showMessage('❌ Error: ' + error.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✅ Verify & Continue';
+      }
+    });
+
+    function startCodeTimer() {
+      codeExpireTime = Date.now() + (15 * 60 * 1000);
+      codeTimerInterval = setInterval(() => {
+        const remaining = Math.max(0, codeExpireTime - Date.now());
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        
+        document.getElementById('timerCount').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (remaining < 300000) {
+          document.getElementById('timer').classList.add('warning');
+        }
+        
+        if (remaining === 0) {
+          clearInterval(codeTimerInterval);
+          showMessage('❌ Code expired. Please try again.', 'error');
+          goBackToEmail();
+        }
+      }, 1000);
+    }
+
+    function startResendCooldown() {
+      resendCooldown = 60;
+      const resendLink = document.getElementById('resendLink');
+      resendLink.classList.add('disabled');
+      
+      const interval = setInterval(() => {
+        resendCooldown--;
+        document.getElementById('resendTimer').textContent = resendCooldown;
+        
+        if (resendCooldown === 0) {
+          clearInterval(interval);
+          resendLink.classList.remove('disabled');
+          resendLink.onclick = resendCode;
+        }
+      }, 1000);
+    }
+
+    async function resendCode() {
+      if (resendCooldown > 0) return;
+      
+      const resendLink = document.getElementById('resendLink');
+      resendLink.textContent = '⏳ Sending...';
+      
+      try {
+        const response = await fetch('/api/admin/request-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: verificationEmail })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showMessage('✅ New code sent!', 'success');
+          
+          if (codeTimerInterval) clearInterval(codeTimerInterval);
+          document.getElementById('timer').classList.remove('warning');
+          document.getElementById('code').value = '';
+          
+          startCodeTimer();
+          startResendCooldown();
+        } else {
+          showMessage('❌ ' + data.message, 'error');
+        }
+      } catch (error) {
+        showMessage('❌ Error: ' + error.message, 'error');
+      } finally {
+        resendLink.textContent = 'Resend Code in 60s';
+      }
+    }
+
+    function goBackToEmail() {
+      if (codeTimerInterval) clearInterval(codeTimerInterval);
+      document.getElementById('step-1').style.display = 'block';
+      document.getElementById('step-2').style.display = 'none';
+      document.getElementById('message').style.display = 'none';
+      document.getElementById('verifyForm').reset();
+      document.getElementById('email').focus();
+    }
+
+    // Close modal when pressing Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAdminModal();
+    });
+  </script>
+</body>
+</html>
