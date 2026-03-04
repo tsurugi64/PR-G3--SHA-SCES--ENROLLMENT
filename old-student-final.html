@@ -850,7 +850,10 @@ async function submitEnrollment(event) {
     try {
         // For old students, ALWAYS set grade to 12 (Grade 11 → Grade 12 conversion)
         const studentType = sessionStorage.getItem('studentType');
-        const gradeLevel = studentType === 'old' ? '12' : sessionStorage.getItem('gradeLevel');
+        const isOldStudent = studentType === 'old';
+        const gradeLevel = isOldStudent ? '12' : sessionStorage.getItem('gradeLevel');
+        
+        console.log('📤 Submitting enrollment - StudentType:', studentType, 'IsOldStudent:', isOldStudent);
         
         // Collect all form values using proper IDs
         const studentInfo = {
@@ -907,10 +910,11 @@ async function submitEnrollment(event) {
             parentsInfo,
             addressInfo,
             emergencyContact,
-            isNewStudent: false  // Always false for old students
+            isNewStudent: !isOldStudent,  // False for old students, true for new
+            isOldStudent: isOldStudent     // Explicitly flag as old student for backend
         };
         
-        // If old student, include the enrollment ID
+        // If old student, include the enrollment ID from their previous enrollment
         const enrollmentID = sessionStorage.getItem('enrollmentID');
         if (enrollmentID) {
             enrollmentData.enrollmentID = enrollmentID;
@@ -938,10 +942,11 @@ async function submitEnrollment(event) {
         });
 
         const result = await response.json();
+        console.log('📥 Enrollment response:', result);
 
         if (result.success) {
             // Show celebration modal with Grade 12 confirmation for old students
-            const displayGrade = studentType === 'old' ? '12 (Senior High School)' : studentInfo.gradeLevel;
+            const displayGrade = isOldStudent ? '12 (Senior High School - Grade 11→12 Conversion)' : studentInfo.gradeLevel;
             showCelebration(result.enrollmentId, displayGrade, 'Old Student - Re-enrollment');
             
             // Clear form after successful submission
@@ -958,6 +963,7 @@ async function submitEnrollment(event) {
             sessionStorage.removeItem('oldStudentData');
             sessionStorage.removeItem('enrollmentID');
         } else {
+            console.error('❌ Enrollment error:', result.message);
             alert('Error: ' + result.message);
         }
 
@@ -994,62 +1000,123 @@ function toggleDarkMode(){
 }
 
 function loadOldStudentData() {
+    console.log('🔍 Attempting to load old student data from sessionStorage...');
     const oldStudentDataStr = sessionStorage.getItem('oldStudentData');
+    
+    console.log('📦 SessionStorage oldStudentData exists:', !!oldStudentDataStr);
+    console.log('📦 SessionStorage studentType:', sessionStorage.getItem('studentType'));
+    console.log('📦 SessionStorage enrollmentID:', sessionStorage.getItem('enrollmentID'));
+    
+    if (!oldStudentDataStr) {
+        console.warn('⚠️ No oldStudentData in sessionStorage. Data may not have been properly transferred.');
+        // Show a notice to user
+        const notice = document.querySelector('.notice-banner');
+        if (notice) {
+            notice.innerHTML += '<br><small style="color: #ff9800;">⚠️ Tip: Make sure you completed the LRN verification step.</small>';
+        }
+        return;
+    }
+    
     if (oldStudentDataStr) {
         try {
             const data = JSON.parse(oldStudentDataStr);
-            const studentInfo = data.studentInfo;
+            console.log('✅ Parsed oldStudentData successfully:', data);
             
-            // Auto-fill student info
-            document.getElementById('lrn').value = studentInfo.lrn || '';
-            document.getElementById('schoolYear').value = studentInfo.schoolYear || '2025-2026'; // Set current school year
-            document.getElementById('firstName').value = studentInfo.firstName || '';
-            document.getElementById('middleName').value = studentInfo.middleName || '';
-            document.getElementById('lastName').value = studentInfo.lastName || '';
-            document.getElementById('suffix').value = studentInfo.suffix || '';
-            document.getElementById('sex').value = studentInfo.sex || '';
+            const studentInfo = data.studentInfo || data;
             
-            // Format and set Date of Birth (YYYY-MM-DD format)
+            // Auto-fill student info with error checking
+            const fieldsToFill = {
+                'lrn': studentInfo.lrn,
+                'schoolYear': studentInfo.schoolYear || '2025-2026',
+                'firstName': studentInfo.firstName,
+                'middleName': studentInfo.middleName,
+                'lastName': studentInfo.lastName,
+                'suffix': studentInfo.suffix,
+                'sex': studentInfo.sex,
+                'contactNumber': studentInfo.contactNumber,
+                'email': studentInfo.email,
+                'schoolLastAttended': studentInfo.schoolLastAttended,
+                'gwa': studentInfo.gwa,
+                'fullAddress': studentInfo.houseAddress
+            };
+            
+            // Fill each field and log success
+            Object.keys(fieldsToFill).forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if (element) {
+                    element.value = fieldsToFill[fieldId] || '';
+                    console.log(`✅ Filled ${fieldId}: ${fieldsToFill[fieldId]}`);
+                } else {
+                    console.warn(`⚠️ Could not find field: ${fieldId}`);
+                }
+            });
+            
+            // Format and set Date of Birth with better error handling
             if (studentInfo.dateOfBirth) {
                 const formattedDate = formatDateForInput(studentInfo.dateOfBirth);
-                document.getElementById('dob').value = formattedDate;
-                // Update Flatpickr value
-                const dobPicker = document.querySelector('#dob')._flatpickr;
-                if (dobPicker && formattedDate) {
-                    dobPicker.setDate(formattedDate, true);
+                if (formattedDate) {
+                    document.getElementById('dob').value = formattedDate;
+                    console.log(`✅ Filled dob: ${formattedDate}`);
+                    
+                    // Update Flatpickr value
+                    setTimeout(() => {
+                        try {
+                            const dobPicker = document.querySelector('#dob')._flatpickr;
+                            if (dobPicker && formattedDate) {
+                                dobPicker.setDate(formattedDate, true);
+                                console.log('✅ Flatpickr date updated');
+                            }
+                        } catch (e) {
+                            console.warn('⚠️ Flatpickr update error:', e);
+                        }
+                    }, 300);
+                } else {
+                    console.warn('⚠️ Could not format date:', studentInfo.dateOfBirth);
                 }
             }
-            
-            document.getElementById('contactNumber').value = studentInfo.contactNumber || '';
-            document.getElementById('email').value = studentInfo.email || '';
-            document.getElementById('schoolLastAttended').value = studentInfo.schoolLastAttended || '';
-            document.getElementById('gwa').value = studentInfo.gwa || '';
-            document.getElementById('fullAddress').value = studentInfo.houseAddress || '';
             
             // Auto-fill payment category (radio button)
             if (studentInfo.paymentCategory) {
                 const paymentRadios = document.querySelectorAll('input[name="paymentCategory"]');
+                let found = false;
                 paymentRadios.forEach(radio => {
                     if (radio.value === studentInfo.paymentCategory) {
                         radio.checked = true;
+                        found = true;
                     }
                 });
+                console.log(`${found ? '✅' : '⚠️'} Payment category: ${studentInfo.paymentCategory}`);
             }
             
             // Auto-fill ALS/A&E Passer (radio button)
             if (studentInfo.alsPasser) {
                 const alsRadios = document.querySelectorAll('input[name="alsPasser"]');
+                let found = false;
                 alsRadios.forEach(radio => {
                     if (radio.value === studentInfo.alsPasser) {
                         radio.checked = true;
+                        found = true;
                     }
                 });
+                console.log(`${found ? '✅' : '⚠️'} ALS Passer: ${studentInfo.alsPasser}`);
             }
             
             // Auto-fill parents info
             if (data.parentsInfo) {
-                document.getElementById('fatherName').value = data.parentsInfo.fatherName || '';
-                document.getElementById('fatherContact').value = data.parentsInfo.fatherContact || '';
+                const parentFields = {
+                    'fatherName': data.parentsInfo.fatherName,
+                    'fatherContact': data.parentsInfo.fatherContact,
+                    'motherName': data.parentsInfo.motherName,
+                    'motherContact': data.parentsInfo.motherContact
+                };
+                
+                Object.keys(parentFields).forEach(fieldId => {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        element.value = parentFields[fieldId] || '';
+                        console.log(`✅ Filled ${fieldId}: ${parentFields[fieldId]}`);
+                    }
+                });
                 
                 // Set father alumni radio button
                 if (data.parentsInfo.fatherAlumni) {
@@ -1065,9 +1132,6 @@ function loadOldStudentData() {
                         document.getElementById('fatherYear').value = data.parentsInfo.fatherGraduatedYear || '';
                     }
                 }
-                
-                document.getElementById('motherName').value = data.parentsInfo.motherName || '';
-                document.getElementById('motherContact').value = data.parentsInfo.motherContact || '';
                 
                 // Set mother alumni radio button
                 if (data.parentsInfo.motherAlumni) {
@@ -1100,12 +1164,22 @@ function loadOldStudentData() {
             
             // Auto-fill emergency contact
             if (data.emergencyContact) {
-                document.getElementById('emergencyName').value = data.emergencyContact.name || '';
-                document.getElementById('emergencyRelationship').value = data.emergencyContact.relationship || '';
-                document.getElementById('emergencyContact').value = data.emergencyContact.contactNumber || '';
+                const emergencyFields = {
+                    'emergencyName': data.emergencyContact.name,
+                    'emergencyRelationship': data.emergencyContact.relationship,
+                    'emergencyContact': data.emergencyContact.contactNumber
+                };
+                
+                Object.keys(emergencyFields).forEach(fieldId => {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        element.value = emergencyFields[fieldId] || '';
+                        console.log(`✅ Filled ${fieldId}: ${emergencyFields[fieldId]}`);
+                    }
+                });
             }
             
-            console.log('✅ Old student data loaded successfully');
+            console.log('✅ All old student data loaded successfully');
             
             // Re-check form validity after loading data
             setTimeout(() => {
@@ -1129,9 +1203,11 @@ function loadOldStudentData() {
                 enrollBtn.disabled = !isValid;
                 enrollBtn.style.opacity = isValid ? "1" : "0.6";
                 enrollBtn.style.cursor = isValid ? "pointer" : "not-allowed";
+                console.log(`Form validation: ${isValid ? '✅ Valid' : '❌ Invalid'}`);
             }, 500);
         } catch (error) {
-            console.error('Error loading old student data:', error);
+            console.error('❌ Error loading old student data:', error);
+            alert('Error loading your enrollment data. Please go back and try again.\n' + error.message);
         }
     }
 }

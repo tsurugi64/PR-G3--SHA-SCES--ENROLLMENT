@@ -116,6 +116,7 @@ app.post('/api/enroll', (req, res) => {
             });
         }
         
+        const isOldStudent = enrollmentData.isOldStudent || false;
         const db = readEnrollments();
         
         // Ensure enrollments array exists
@@ -125,6 +126,67 @@ app.post('/api/enroll', (req, res) => {
                 success: false, 
                 message: 'Database error' 
             });
+        }
+        
+        // For old students, check if they're re-enrolling with the same LRN
+        if (isOldStudent && enrollmentData.studentInfo && enrollmentData.studentInfo.lrn) {
+            const lrn = enrollmentData.studentInfo.lrn;
+            console.log(`🔍 Checking if old student LRN ${lrn} already exists...`);
+            
+            // Find existing enrollment with same LRN
+            const existingIndex = db.enrollments.findIndex(e => 
+                e.studentInfo && e.studentInfo.lrn === lrn
+            );
+            
+            if (existingIndex !== -1) {
+                console.log(`✅ Found existing enrollment for old student LRN ${lrn}, updating instead of creating new...`);
+                
+                // Update existing enrollment instead of creating new
+                const updatedData = {
+                    ...db.enrollments[existingIndex],
+                    ...enrollmentData,
+                    id: db.enrollments[existingIndex].id, // Keep original ID
+                    enrollmentDate: new Date().toISOString(),
+                    studentInfo: {
+                        ...db.enrollments[existingIndex].studentInfo,
+                        ...enrollmentData.studentInfo
+                    }
+                };
+                
+                db.enrollments[existingIndex] = updatedData;
+                
+                // Write to file
+                const success = writeEnrollments(db);
+                
+                if (success) {
+                    return res.json({ 
+                        success: true, 
+                        message: 'Old student enrollment updated successfully',
+                        enrollmentId: updatedData.enrollmentID || db.enrollments[existingIndex].enrollmentID
+                    });
+                } else {
+                    return res.status(500).json({ 
+                        success: false, 
+                        message: 'Failed to update enrollment to database' 
+                    });
+                }
+            }
+        }
+        
+        // For new students, check for duplicate LRN
+        if (!isOldStudent && enrollmentData.studentInfo && enrollmentData.studentInfo.lrn) {
+            const lrn = enrollmentData.studentInfo.lrn;
+            const existingStudent = db.enrollments.find(e => 
+                e.studentInfo && e.studentInfo.lrn === lrn
+            );
+            
+            if (existingStudent) {
+                console.log(`❌ Duplicate LRN detected for new student: ${lrn}`);
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'LRN already exists in the system. Please verify your LRN is correct.' 
+                });
+            }
         }
         
         // Add timestamp and unique ID
@@ -151,9 +213,12 @@ app.post('/api/enroll', (req, res) => {
         const success = writeEnrollments(db);
         
         if (success) {
+            const logType = isOldStudent ? '🔄 Old Student Re-enrollment' : '✨ New Student Enrollment';
+            console.log(`${logType} saved: ${enrollmentData.enrollmentID}`);
+            
             res.json({ 
                 success: true, 
-                message: 'Enrollment saved successfully',
+                message: isOldStudent ? 'Old student enrollment updated successfully' : 'Enrollment saved successfully',
                 enrollmentId: enrollmentData.enrollmentID
             });
         } else {
