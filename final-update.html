@@ -1253,7 +1253,17 @@ function showCelebration(enrollmentId, gradeLevel, studentType) {
 }
 
 function goToHome() {
-    window.location.href = 'Home.html';
+    // Check user type from localStorage
+    const userType = localStorage.getItem('userType') || 'student';
+    
+    if (userType === 'teacher') {
+        window.location.href = 'Home.html';
+    } else {
+        window.location.href = 'home-for-student.html';
+    }
+    
+    // Clear user type after redirect
+    localStorage.removeItem('userType');
 }
 
 function createConfetti() {
