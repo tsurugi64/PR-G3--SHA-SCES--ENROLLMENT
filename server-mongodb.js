@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const sgMail = require('@sendgrid/mail');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,8 +51,21 @@ const VerificationCodeSchema = new mongoose.Schema({
 const AdminAccount = mongoose.model('AdminAccount', AdminAccountSchema);
 const VerificationCode = mongoose.model('VerificationCode', VerificationCodeSchema);
 
-// Approved Teachers List
-const APPROVED_TEACHERS = ['surugi64@gmail.com'];
+// Load Approved Teachers from JSON file
+function loadApprovedTeachers() {
+    try {
+        const filePath = path.join(__dirname, 'admin-authorized.json');
+        const data = fs.readFileSync(filePath, 'utf8');
+        const json = JSON.parse(data);
+        return json.authorizedEmails || [];
+    } catch (error) {
+        console.error('Error loading admin-authorized.json:', error);
+        return [];
+    }
+}
+
+let APPROVED_TEACHERS = loadApprovedTeachers();
+console.log(`✅ Loaded ${APPROVED_TEACHERS.length} authorized teacher emails`);
 
 // Helper function to generate 6-digit code
 function generateVerificationCode() {
