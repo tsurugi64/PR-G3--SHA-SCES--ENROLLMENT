@@ -471,6 +471,7 @@
 let allEnrollments = [];
 let filteredEnrollments = [];
 let currentEnrollmentId = null;
+let currentEnrollmentMongoId = null;
 let currentEditingEnrollmentId = null;
 let dateFilterOrder = 'new'; // 'new' for newest first, 'old' for oldest first
 
@@ -573,7 +574,7 @@ function renderTable() {
                     <button class="action-btn view-btn" onclick="viewEnrollment(this)" style="padding: 6px 12px; font-size: 12px;">
                         View
                     </button>
-                    <button class="action-btn delete-btn" onclick="deleteEnrollment(this)" style="padding: 6px 12px; font-size: 12px;">
+                    <button class="action-btn delete-btn" onclick="deleteEnrollmentById(this)" style="padding: 6px 12px; font-size: 12px;">
                         Delete
                     </button>
                 </td>
@@ -591,10 +592,11 @@ function renderTable() {
 
 function viewEnrollment(button) {
     const row = button.closest('tr');
-    const enrollmentId = row.querySelector('td').textContent;
-    const enrollment = allEnrollments.find(e => e.id == enrollmentId);
+    const enrollmentId = row.querySelector('td').textContent.trim();
+    const enrollment = allEnrollments.find(e => e.enrollmentID === enrollmentId);
     
     currentEnrollmentId = enrollmentId;
+    currentEnrollmentMongoId = enrollment._id;
 
     if (!enrollment) return;
 
@@ -762,11 +764,11 @@ function closeModal() {
 }
 
 async function deleteCurrentEnrollment() {
-    if (!currentEnrollmentId) return;
+    if (!currentEnrollmentMongoId) return;
 
     if (confirm('Are you sure you want to delete this enrollment record?')) {
         try {
-            const response = await fetch(`/api/enrollments/${currentEnrollmentId}`, {
+            const response = await fetch(`/api/enrollments/${currentEnrollmentMongoId}`, {
                 method: 'DELETE'
             });
 
@@ -776,7 +778,7 @@ async function deleteCurrentEnrollment() {
                 closeModal();
                 loadEnrollments();
             } else {
-                alert('Error deleting enrollment');
+                alert('Error deleting enrollment: ' + result.message);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -793,27 +795,40 @@ function confirmDelete(button) {
     }
 }
 
-async function deleteEnrollment(id) {
-    try {
-        const response = await fetch(`/api/enrollments/${id}`, {
-            method: 'DELETE'
-        });
+async function deleteEnrollmentById(button) {
+    const row = button.closest('tr');
+    const enrollmentId = row.querySelector('td').textContent.trim();
+    
+    if (confirm('Are you sure you want to delete this enrollment record?')) {
+        try {
+            // Use enrollmentID to query
+            const enrollment = allEnrollments.find(e => e.enrollmentID === enrollmentId);
+            if (!enrollment) {
+                alert('Enrollment not found');
+                return;
+            }
+            
+            // Delete using the MongoDB _id field
+            const response = await fetch(`/api/enrollments/${enrollment._id}`, {
+                method: 'DELETE'
+            });
 
-        const result = await response.json();
-        if (result.success) {
-            alert('Enrollment deleted successfully');
-            loadEnrollments();
-        } else {
+            const result = await response.json();
+            if (result.success) {
+                alert('Enrollment deleted successfully');
+                loadEnrollments();
+            } else {
+                alert('Error deleting enrollment: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
             alert('Error deleting enrollment');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error deleting enrollment');
     }
 }
 
 function printCurrentEnrollment() {
-    const enrollment = allEnrollments.find(e => e.id === currentEnrollmentId);
+    const enrollment = allEnrollments.find(e => e.enrollmentID === currentEnrollmentId);
     if (!enrollment) return;
 
     const printWindow = window.open('', '', 'height=600,width=800');

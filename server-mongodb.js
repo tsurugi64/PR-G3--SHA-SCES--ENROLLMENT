@@ -401,7 +401,7 @@ app.put('/api/enrollments/:id', async (req, res) => {
 // Delete enrollment
 app.delete('/api/enrollments/:id', async (req, res) => {
     try {
-        const result = await Enrollment.findOneAndDelete({ id: parseInt(req.params.id) });
+        const result = await Enrollment.findByIdAndDelete(req.params.id);
         
         if (result) {
             res.json({ 
@@ -415,9 +415,10 @@ app.delete('/api/enrollments/:id', async (req, res) => {
             });
         }
     } catch (error) {
+        console.error('Error deleting enrollment:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Error deleting enrollment' 
+            message: 'Error deleting enrollment: ' + error.message 
         });
     }
 });
