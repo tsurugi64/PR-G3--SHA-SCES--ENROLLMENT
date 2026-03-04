@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const enrollmentSchema = new mongoose.Schema({
     id: {
         type: Number,
-        default: null
+        default: null,
+        sparse: true
     },
     enrollmentID: {
         type: String,

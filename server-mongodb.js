@@ -282,6 +282,31 @@ app.post('/api/enroll', async (req, res) => {
         // Handle MongoDB duplicate key errors
         if (error.code === 11000) {
             const field = Object.keys(error.keyPattern)[0];
+            
+            // Ignore duplicate 'id' errors (legacy field, we use enrollmentID now)
+            if (field === 'id') {
+                // Ignore and retry without the id field
+                try {
+                    enrollmentData.id = null;
+                    if (enrollmentData.enrollmentID && enrollmentData.isNewStudent === false) {
+                        await Enrollment.updateOne(
+                            { enrollmentID: enrollmentData.enrollmentID },
+                            enrollmentData
+                        );
+                    } else {
+                        const enrollment = new Enrollment(enrollmentData);
+                        await enrollment.save();
+                    }
+                    return res.json({ 
+                        success: true, 
+                        message: 'Enrollment saved successfully',
+                        enrollmentId: enrollmentData.enrollmentID
+                    });
+                } catch (retryError) {
+                    console.error('Retry failed:', retryError);
+                }
+            }
+            
             return res.status(400).json({
                 success: false,
                 message: `A student with this ${field} already exists`
