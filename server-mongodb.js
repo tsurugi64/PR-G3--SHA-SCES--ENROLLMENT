@@ -637,7 +637,7 @@ app.get('/api/health', (req, res) => {
 
 // Catch-all for static files
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin-login.html'));
+    res.sendFile(path.join(__dirname, 'FRONT PAGE.html'));
 });
 
 // Start server
