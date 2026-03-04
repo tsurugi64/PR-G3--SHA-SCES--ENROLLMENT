@@ -707,7 +707,7 @@ app.post('/api/admin/check-email', async (req, res) => {
         
         const trimmedEmail = email.trim().toLowerCase();
         
-        // Check if email is in approved list
+        // Check if email is in approved list (ONLY CHECK - don't block for existing accounts)
         const isApproved = APPROVED_TEACHERS.some(approvedEmail => 
             approvedEmail.toLowerCase() === trimmedEmail
         );
@@ -720,19 +720,7 @@ app.post('/api/admin/check-email', async (req, res) => {
             });
         }
         
-        // Check if account already exists
-        const existingAccount = await AdminAccount.findOne({ 
-            email: { $regex: `^${trimmedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } 
-        });
-        
-        if (existingAccount) {
-            console.log(`⚠️ Account already exists for authorized email: ${trimmedEmail}`);
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Account already exists for this email. Please login instead.' 
-            });
-        }
-        
+        // Email is in whitelist - let them proceed!
         console.log(`✅ Email verified as authorized: ${trimmedEmail}`);
         res.json({ 
             success: true, 
