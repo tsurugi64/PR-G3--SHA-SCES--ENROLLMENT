@@ -6,8 +6,29 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Old Student Enrollment - Sacred Heart Academy</title>
+    <title>Sacred Heart Academy of Sta. Maria - Old Student</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --bg: linear-gradient(135deg, #e9ffff, #ffffff, #e0faf6);
+            --card-bg: linear-gradient(145deg, #ffffff, #e8f8f5);
+            --text: #003f39;
+            --input-bg: linear-gradient(145deg, #ffffff, #eefaf7);
+            --button-bg: linear-gradient(145deg, #00b4a4, #008f80);
+            --shadow: rgba(0,0,0,0.2);
+        }
+        
+        body.dark {
+            --bg: #0f1515;
+            --card-bg: linear-gradient(145deg, #1a2424, #0d1313);
+            --text: #e0fffb;
+            --input-bg: #1c2424;
+            --button-bg: linear-gradient(145deg, #00887a, #00685d);
+            --shadow: rgba(0,0,0,0.7);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -15,151 +36,147 @@
         }
 
         body {
-            font-family: "Poppins", Arial, sans-serif;
-            background: linear-gradient(135deg, #e9ffff, #ffffff, #e0faf6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0;
+            font-family: Poppins, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            padding: 20px;
         }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-        }
-
+        /* HEADER */
         .header {
-            text-align: center;
-            margin-bottom: 40px;
+            background: #00A693;
+            color: white;
+            padding: 13px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .logo {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 15px;
+        .logo-button {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
         }
 
         .logo img {
-            width: 100%;
+            width: 60px;
+            margin-right: 12px;
         }
 
         .school-name {
-            font-size: 1.4em;
-            color: #00A693;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .step-indicator {
-            background: #f0f9f8;
-            border-left: 4px solid #00A693;
-            padding: 15px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-        }
-
-        .step-title {
-            color: #00A693;
+            font-size: 1.2em;
             font-weight: 600;
-            margin-bottom: 5px;
         }
 
-        .step-description {
-            color: #555;
-            font-size: 0.95em;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            color: #003f39;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 1em;
-        }
-
-        .required {
-            color: #e74c3c;
-        }
-
-        input[type="text"], 
-        input[type="password"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #d0e8e5;
-            border-radius: 10px;
-            font-size: 1em;
-            font-family: "Poppins", Arial, sans-serif;
-            transition: 0.3s;
-        }
-
-        input[type="text"]:focus, 
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #00A693;
-            box-shadow: 0 0 8px rgba(0, 166, 147, 0.2);
-        }
-
-        .info-text {
-            color: #999;
-            font-size: 0.85em;
-            margin-top: 5px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        button {
-            flex: 1;
-            padding: 12px 20px;
+        .dark-btn {
+            background: var(--button-bg);
             border: none;
-            border-radius: 10px;
-            font-size: 1em;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* PROGRESS BAR */
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 8%;
+            right: 8%;
+            height: 4px;
+            background: #b5d8d2;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #b5d8d2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
-            font-family: "Poppins", Arial, sans-serif;
+            z-index: 1;
+            transition: 0.3s ease;
         }
 
-        .btn-primary {
+        .progress-step.active {
             background: #00A693;
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #008f80;
-            transform: translateY(-2px);
+        .progress-step.completed {
+            background: #4caf50;
+            color: white;
         }
 
-        .btn-primary:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
+        /* FORM SECTION */
+        .question-section {
+            width: 90%;
+            max-width: 850px;
+            margin: 25px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 18px var(--shadow);
         }
 
-        .btn-secondary {
-            background: #f0f0f0;
+        .form-title {
             color: #003f39;
+            margin-bottom: 25px;
+            font-size: 1.6em;
         }
 
-        .btn-secondary:hover {
-            background: #e0e0e0;
+        .requirement-label {
+            display: flex;
+            align-items: center;
+            margin: 25px 0 15px 0;
+            font-weight: 500;
+        }
+
+        .requirement-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #00A693;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #00A693;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #b5d8d2;
+            background: var(--input-bg);
+            font-family: Poppins, sans-serif;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #00A693;
         }
 
         .message {
@@ -186,10 +203,93 @@
             border-left: 4px solid #f5c6cb;
         }
 
-        .info-msg {
-            background: #d1ecf1;
-            color: #0c5460;
-            border-left: 4px solid #bee5eb;
+        .student-name-display {
+            background: linear-gradient(145deg, #f0faf8, #ffffff);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #00A693;
+        }
+
+        body.dark .student-name-display {
+            background: linear-gradient(145deg, #1a2424, #0d1313);
+        }
+
+        .student-name-display div:first-child {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .student-name-display div:last-child {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #003f39;
+        }
+
+        body.dark .student-name-display div:last-child {
+            color: #e0fffb;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: Poppins, sans-serif;
+        }
+
+        .btn-primary {
+            background: #00A693;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #008f80;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #003f39;
+        }
+
+        body.dark .btn-secondary {
+            background: #2a3a39;
+            color: #e0fffb;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        body.dark .btn-secondary:hover {
+            background: #3a4a49;
+        }
+
+        small {
+            display: block;
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .hidden-step {
+            display: none;
+        }
+
+        .visible-step {
+            display: block;
+            animation: slideDown 0.3s ease-out;
         }
 
         @keyframes slideDown {
@@ -203,121 +303,80 @@
             }
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        body.dark {
+            --text: #e0fffb;
         }
 
-        .modal.show {
-            display: flex;
+        body.dark input[type="text"],
+        body.dark input[type="password"] {
+            color: #e0fffb;
         }
 
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 450px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            animation: popIn 0.3s ease-out;
+        body.dark .form-title {
+            color: #e0fffb;
         }
 
-        @keyframes popIn {
-            from {
-                transform: scale(0.9);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+        body.dark .requirement-label {
+            color: #e0fffb;
         }
 
-        .modal h3 {
-            color: #00A693;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        .student-info {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #00A693;
-        }
-
-        .student-name {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #003f39;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .back-link a {
-            color: #00A693;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
+        body.dark small {
+            color: #b0d0cd;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <img src="sha_logo.png" alt="SHA Logo">
-            </div>
-            <div class="school-name">Sacred Heart Academy of Santa Maria</div>
-            <div class="subtitle">Old Student Re-enrollment</div>
+    <!-- HEADER -->
+    <div class="header">
+        <a href="home-for-student.html" class="logo-button">
+            <div class="logo"><img src="sha_logo.png" alt="SHA Logo"></div>
+            <div class="school-name">Sacred Heart Academy of Sta. Maria (Bulacan), Inc.</div>
+        </a>
+        <button class="dark-btn" onclick="toggleDarkMode()" id="modeBtn">🌙 Dark Mode</button>
+    </div>
+
+    <div class="question-section">
+        <!-- PROGRESS BAR -->
+        <div class="progress-container">
+            <div class="progress-step active" id="step-1-indicator">1</div>
+            <div class="progress-step" id="step-2-indicator">2</div>
+            <div class="progress-step" id="step-3-indicator">3</div>
         </div>
 
-        <!-- STEP 1: ENROLLMENT ID LOOKUP -->
-        <div id="step1-enrollment-id">
-            <div class="step-indicator">
-                <div class="step-title">Step 1: Find Your Record</div>
-                <div class="step-description">Enter your enrollment ID to look up your previous records</div>
-            </div>
+        <h2 class="form-title">Old Student Re-enrollment</h2>
 
-            <div id="messageBox" class="message"></div>
-
-            <div class="form-group">
-                <label for="enrollmentID">Enrollment ID <span class="required">*</span></label>
-                <input type="text" id="enrollmentID" placeholder="Format: 2025-00001" maxlength="12">
-                <p class="info-text">Example: 2026-00007</p>
+        <!-- STEP 1: ENROLLMENT ID -->
+        <div id="step1-enrollment-id" class="visible-step">
+            <div class="message" id="messageBox1"></div>
+            
+            <div class="requirement-label">
+                <div class="requirement-icon">1</div>
+                <span>Verify Your Enrollment ID <span style="color: red;">*</span></span>
             </div>
-
-            <div class="button-group">
-                <button class="btn-primary" onclick="searchEnrollment()">Search ID</button>
-                <button class="btn-secondary" onclick="goHome()">Go Home</button>
-            </div>
+            <input 
+                type="text" 
+                id="enrollmentId" 
+                placeholder="e.g., 2026-000001" 
+                maxlength="20"
+            />
+            <small>Enter your Sacred Heart Academy enrollment ID (Format: YYYY-NNNNNN)</small>
+            <button class="btn-primary" onclick="searchEnrollment()" style="margin-top: 20px; width: 100%;">
+                Search Enrollment
+            </button>
         </div>
 
         <!-- STEP 2: CONFIRM IDENTITY -->
-        <div id="step2-confirm-identity" style="display: none;">
-            <div class="step-indicator">
-                <div class="step-title">Step 2: Confirm Your Identity</div>
-                <div class="step-description">Verify if this is your information</div>
+        <div id="step2-confirm" class="hidden-step">
+            <div class="message" id="messageBox2"></div>
+            
+            <div class="requirement-label">
+                <div class="requirement-icon">2</div>
+                <span>Confirm Your Identity</span>
             </div>
-
-            <div id="messageBox2" class="message"></div>
-
-            <div class="student-info">
-                <p style="color: #999; font-size: 0.9em; margin-bottom: 10px;">Is this your name?</p>
-                <div class="student-name" id="studentNameDisplay"></div>
+            
+            <div class="student-name-display">
+                <div>Is this your name?</div>
+                <div id="studentNameDisplay"></div>
             </div>
 
             <div class="button-group">
@@ -327,43 +386,68 @@
         </div>
 
         <!-- STEP 3: LRN VERIFICATION -->
-        <div id="step3-lrn-verification" style="display: none;">
-            <div class="step-indicator">
-                <div class="step-title">Step 3: Verify with LRN</div>
-                <div class="step-description">Enter your LRN as verification password</div>
+        <div id="step3-lrn" class="hidden-step">
+            <div class="message" id="messageBox3"></div>
+            
+            <div class="requirement-label">
+                <div class="requirement-icon">3</div>
+                <span>Verify with LRN <span style="color: red;">*</span></span>
             </div>
 
-            <div id="messageBox3" class="message"></div>
-
-            <div class="student-info">
-                <p style="color: #999; font-size: 0.9em;">Verifying for:</p>
-                <div class="student-name" id="studentNameDisplay2"></div>
+            <div class="student-name-display">
+                <div>Verifying for:</div>
+                <div id="studentNameDisplay2"></div>
             </div>
 
-            <div class="form-group">
-                <label for="lrnInput">LRN (Learning Record Number) <span class="required">*</span></label>
-                <input type="password" id="lrnInput" placeholder="12-digit number" maxlength="12" inputmode="numeric">
-                <p class="info-text">Your 12-digit identification number</p>
-            </div>
+            <input 
+                type="password" 
+                id="lrnInput" 
+                placeholder="12-digit number" 
+                maxlength="12" 
+                inputmode="numeric"
+            />
+            <small>Your 12-digit Learning Record Number (LRN)</small>
 
             <div class="button-group">
-                <button class="btn-primary" onclick="verifyLRN()">Verify LRN</button>
-                <button class="btn-secondary" onclick="resetForm()">Go Back</button>
+                <button class="btn-primary" onclick="verifyLRN()" style="margin-top: 20px; width: 100%;">
+                    Verify LRN
+                </button>
             </div>
-        </div>
-
-        <div class="back-link">
-            <a onclick="goHome()">← Back to Home</a>
         </div>
     </div>
 
     <script>
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+            updateButtonText();
+        }
+
+        function updateButtonText() {
+            const btn = document.getElementById('modeBtn');
+            if (document.body.classList.contains('dark')) {
+                btn.textContent = '☀️ Light Mode';
+            } else {
+                btn.textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // Load dark mode preference
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark');
+            }
+            updateButtonText();
+            document.getElementById('enrollmentId').focus();
+        });
+
         let currentEnrollmentData = null;
 
         // Search for enrollment by ID
         async function searchEnrollment() {
-            const enrollmentID = document.getElementById('enrollmentID').value.trim();
-            const messageBox = document.getElementById('messageBox');
+            const enrollmentID = document.getElementById('enrollmentId').value.trim();
+            const messageBox = document.getElementById('messageBox1');
 
             if (!enrollmentID) {
                 showMessage(messageBox, '❌ Please enter an enrollment ID', 'error');
@@ -384,12 +468,10 @@
                     showMessage(messageBox, '✅ Enrollment ID found!', 'success');
                     
                     setTimeout(() => {
-                        document.getElementById('step1-enrollment-id').style.display = 'none';
-                        document.getElementById('step2-confirm-identity').style.display = 'block';
-                        document.getElementById('studentNameDisplay').textContent = result.studentName;
+                        goToStep2();
                     }, 500);
                 } else {
-                    showMessage(messageBox, '❌ ' + result.message + '\n\nPlease check your Enrollment ID or ask your guidance counselor for assistance.', 'error');
+                    showMessage(messageBox, '❌ ' + result.message, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -400,12 +482,10 @@
         // Confirm student identity
         function confirmIdentity() {
             const messageBox = document.getElementById('messageBox2');
-            showMessage(messageBox, '✅ Identity confirmed! Now verify with your LRN.', 'success');
+            showMessage(messageBox, '✅ Identity confirmed!', 'success');
 
             setTimeout(() => {
-                document.getElementById('step2-confirm-identity').style.display = 'none';
-                document.getElementById('step3-lrn-verification').style.display = 'block';
-                document.getElementById('studentNameDisplay2').textContent = currentEnrollmentData.studentName;
+                goToStep3();
             }, 500);
         }
 
@@ -432,7 +512,7 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    showMessage(messageBox, '✅ LRN verified! Redirecting to enrollment form...', 'success');
+                    showMessage(messageBox, '✅ LRN verified! Redirecting...', 'success');
                     
                     setTimeout(() => {
                         // Store old student data in session
@@ -453,17 +533,59 @@
             }
         }
 
+        // Navigation functions
+        function goToStep2() {
+            document.getElementById('step1-enrollment-id').classList.remove('visible-step');
+            document.getElementById('step1-enrollment-id').classList.add('hidden-step');
+            
+            document.getElementById('step2-confirm').classList.remove('hidden-step');
+            document.getElementById('step2-confirm').classList.add('visible-step');
+            
+            document.getElementById('step-1-indicator').classList.remove('active');
+            document.getElementById('step-1-indicator').classList.add('completed');
+            document.getElementById('step-2-indicator').classList.add('active');
+            
+            document.getElementById('studentNameDisplay').textContent = currentEnrollmentData.studentName;
+        }
+
+        function goToStep3() {
+            document.getElementById('step2-confirm').classList.remove('visible-step');
+            document.getElementById('step2-confirm').classList.add('hidden-step');
+            
+            document.getElementById('step3-lrn').classList.remove('hidden-step');
+            document.getElementById('step3-lrn').classList.add('visible-step');
+            
+            document.getElementById('step-2-indicator').classList.remove('active');
+            document.getElementById('step-2-indicator').classList.add('completed');
+            document.getElementById('step-3-indicator').classList.add('active');
+            
+            document.getElementById('studentNameDisplay2').textContent = currentEnrollmentData.studentName;
+            document.getElementById('lrnInput').focus();
+        }
+
         // Reset form
         function resetForm() {
             currentEnrollmentData = null;
-            document.getElementById('enrollmentID').value = '';
+            document.getElementById('enrollmentId').value = '';
             document.getElementById('lrnInput').value = '';
-            document.getElementById('step1-enrollment-id').style.display = 'block';
-            document.getElementById('step2-confirm-identity').style.display = 'none';
-            document.getElementById('step3-lrn-verification').style.display = 'none';
-            document.getElementById('messageBox').classList.remove('show');
+            
+            document.getElementById('step1-enrollment-id').classList.remove('hidden-step');
+            document.getElementById('step1-enrollment-id').classList.add('visible-step');
+            document.getElementById('step2-confirm').classList.remove('visible-step');
+            document.getElementById('step2-confirm').classList.add('hidden-step');
+            document.getElementById('step3-lrn').classList.remove('visible-step');
+            document.getElementById('step3-lrn').classList.add('hidden-step');
+            
+            document.getElementById('step-1-indicator').classList.remove('completed');
+            document.getElementById('step-1-indicator').classList.add('active');
+            document.getElementById('step-2-indicator').classList.remove('active', 'completed');
+            document.getElementById('step-3-indicator').classList.remove('active', 'completed');
+            
+            document.getElementById('messageBox1').classList.remove('show');
             document.getElementById('messageBox2').classList.remove('show');
             document.getElementById('messageBox3').classList.remove('show');
+            
+            document.getElementById('enrollmentId').focus();
         }
 
         // Show message
@@ -471,16 +593,6 @@
             element.textContent = message;
             element.className = `message show ${type}-msg`;
         }
-
-        // Go home
-        function goHome() {
-            window.location.href = 'home-for-student.html';
-        }
-
-        // Focus on input when page loads
-        window.addEventListener('load', () => {
-            document.getElementById('enrollmentID').focus();
-        });
     </script>
 </body>
 </html>
