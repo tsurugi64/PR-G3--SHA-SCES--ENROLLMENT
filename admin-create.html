@@ -382,7 +382,7 @@
         </div>
 
         <div class="back-link">
-            <a href="admin-login.html">← Back to Login</a>
+            <a href="admin-verify.html">← Back to Email Verification</a>
         </div>
     </div>
 
@@ -393,6 +393,124 @@
         let codeExpireTime = null;
         let verificationAttempts = 0;
         const MAX_VERIFICATION_ATTEMPTS = 3;
+
+        // On page load, check if user came from verification page
+        window.addEventListener('DOMContentLoaded', () => {
+            const verifiedEmail = sessionStorage.getItem('verifiedAdminEmail');
+            if (verifiedEmail) {
+                // User already verified, skip to account creation
+                verificationEmail = verifiedEmail;
+                document.getElementById('verifyEmail').value = verifiedEmail;
+                document.getElementById('step-1').style.display = 'none';
+                document.getElementById('step-2').style.display = 'block';
+                document.getElementById('code').focus();
+                
+                // Note: Code has already been verified, so we just need username/password
+                document.getElementById('verifyForm').innerHTML = `
+                    <div class="form-group">
+                        <label for="verifyEmail">Email:</label>
+                        <input 
+                            type="email" 
+                            id="verifyEmail" 
+                            value="${verifiedEmail}"
+                            readonly
+                        >
+                    </div>
+
+                    <div style="background: #d4edda; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #155724; font-size: 0.9em;">
+                        ✅ Email verified! Now create your account.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Create Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="your_username"
+                            minlength="3"
+                            required
+                        >
+                        <small style="color: #666;">3+ characters, no spaces</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Create Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Strong password"
+                            minlength="6"
+                            required
+                        >
+                        <small style="color: #666;">At least 6 characters</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="verifyBtn">
+                        ✅ Create Account
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='admin-verify.html'">
+                        ← Back to Verification
+                    </button>
+                `;
+
+                // Reattach submit listener
+                document.getElementById('verifyForm').addEventListener('submit', handleAccountCreation);
+            }
+        });
+
+        async function handleAccountCreation(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('verifyBtn');
+            
+            if (!username || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating account...';
+            
+            try {
+                // Create account with verified email (code already verified)
+                const response = await fetch('/api/admin/create-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: verificationEmail,
+                        username,
+                        password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    verificationAttempts = 0;
+                    showMessage('✅ Account created successfully! Redirecting to login...', 'success');
+                    
+                    // Clear session
+                    sessionStorage.removeItem('verifiedAdminEmail');
+                    
+                    // Redirect to login after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'admin-login.html';
+                    }, 2000);
+                } else {
+                    showMessage('❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Error: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✅ Create Account';
+            }
+        }
 
         // Show message
         function showMessage(message, type = 'info') {

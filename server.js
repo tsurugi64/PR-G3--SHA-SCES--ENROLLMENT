@@ -787,6 +787,123 @@ app.post('/api/admin/request-code', async (req, res) => {
     }
 });
 
+// Step 2.5: Just verify the code without creating account (for admin-verify.html)
+app.post('/api/admin/verify-email-code', async (req, res) => {
+    try {
+        const { email, code } = req.body;
+        
+        if (!email || !code) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Email and code are required' 
+            });
+        }
+        
+        // Find and verify code
+        const verificationRecord = await VerificationCode.findOne({ email });
+        
+        if (!verificationRecord) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'No verification code found for this email' 
+            });
+        }
+        
+        // Check if code is expired
+        if (new Date() > verificationRecord.expiresAt) {
+            await VerificationCode.deleteOne({ email });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Verification code has expired' 
+            });
+        }
+        
+        // Check if code matches
+        if (verificationRecord.code !== code) {
+            verificationRecord.attempts = (verificationRecord.attempts || 0) + 1;
+            await verificationRecord.save();
+            
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid verification code'
+            });
+        }
+        
+        // Code is valid!
+        res.json({ 
+            success: true, 
+            message: 'Email verified successfully',
+            email: email
+        });
+    } catch (error) {
+        console.error('Error verifying email code:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error: ' + error.message 
+        });
+    }
+});
+
+// Create account with pre-verified email (from admin-verify.html)
+app.post('/api/admin/create-account', async (req, res) => {
+    try {
+        const { email, username, password } = req.body;
+        
+        if (!email || !username || !password) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Email, username, and password are required' 
+            });
+        }
+        
+        // Check if username is available
+        const existingUsername = await AdminAccount.findOne({ username: { $regex: username, $options: 'i' } });
+        if (existingUsername) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Username already taken' 
+            });
+        }
+        
+        // Check if email already has an account
+        const existingEmail = await AdminAccount.findOne({ email: { $regex: email, $options: 'i' } });
+        if (existingEmail) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'An account with this email already exists' 
+            });
+        }
+        
+        // Create new account
+        const newAccount = new AdminAccount({
+            email,
+            username,
+            password, // In production, use bcrypt to hash passwords
+            verified: true
+        });
+        
+        await newAccount.save();
+        
+        console.log(`✅ New admin account created: ${username} (${email})`);
+        
+        res.json({ 
+            success: true, 
+            message: 'Account created successfully! You can now login.',
+            account: {
+                id: newAccount._id,
+                username: newAccount.username,
+                email: newAccount.email
+            }
+        });
+    } catch (error) {
+        console.error('Error creating account:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error: ' + error.message 
+        });
+    }
+});
+
 // Step 2: Verify code and create account
 app.post('/api/admin/verify-code', async (req, res) => {
     try {
